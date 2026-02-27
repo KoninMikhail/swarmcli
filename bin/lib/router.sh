@@ -188,7 +188,7 @@ route_command() {
       [ -n "$stack" ] || fail "usage: swarmcli inspect <STACK>"
       cmd_stack_inspect "$stack"
       ;;
-    validate)
+    validate|check)
       local stack
       stack=$(select_stack_interactive "${1:-}")
       cmd_validate "$stack"

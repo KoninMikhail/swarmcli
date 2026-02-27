@@ -141,7 +141,7 @@ cmd_secret_create() {
         local in_use
         in_use=$(docker service ls --format '{{.Name}}' 2>/dev/null | while read -r svc; do
           docker service inspect "$svc" --format '{{range .Spec.TaskTemplate.ContainerSpec.Secrets}}{{.SecretName}} {{end}}' 2>/dev/null | grep -qw "$name" && echo "$svc"
-        done | head -1)
+        done | head -1) || true
         
         if [ -n "$in_use" ]; then
           log warn "secret '$name' is in use by service(s). Cannot update directly."
@@ -229,7 +229,7 @@ cmd_secret_rm() {
     local in_use
     in_use=$(docker service ls --format '{{.Name}}' 2>/dev/null | while read -r svc; do
       docker service inspect "$svc" --format '{{range .Spec.TaskTemplate.ContainerSpec.Secrets}}{{.SecretName}} {{end}}' 2>/dev/null | grep -qw "$name" && echo "$svc"
-    done | head -1)
+    done | head -1) || true
     
     if [ -n "$in_use" ]; then
       fail "secret '$name' is in use. Remove it from services first."

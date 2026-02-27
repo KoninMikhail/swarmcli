@@ -46,8 +46,8 @@ load_services_registry() {
   
   # Get list of categories
   local categories
-  categories=$(_run_yaml_parser get_keys "$f" "endpoints" 2>/dev/null)
-  if [ $? -ne 0 ] || [ -z "$categories" ]; then
+  categories=$(_run_yaml_parser get_keys "$f" "endpoints" 2>/dev/null) || true
+  if [ -z "$categories" ]; then
     log warn "no endpoints found in endpoints.yaml"
     return 0
   fi
@@ -60,8 +60,8 @@ load_services_registry() {
     
     # Get list of services in this category
     local services
-    services=$(_run_yaml_parser get_keys "$f" "endpoints.$category" 2>/dev/null)
-    if [ $? -ne 0 ] || [ -z "$services" ]; then
+    services=$(_run_yaml_parser get_keys "$f" "endpoints.$category" 2>/dev/null) || true
+    if [ -z "$services" ]; then
       continue
     fi
     
@@ -219,8 +219,8 @@ list_registry_services() {
   
   # Get list of categories
   local categories
-  categories=$(_run_yaml_parser get_keys "$f" "endpoints" 2>/dev/null)
-  if [ $? -ne 0 ] || [ -z "$categories" ]; then
+  categories=$(_run_yaml_parser get_keys "$f" "endpoints" 2>/dev/null) || true
+  if [ -z "$categories" ]; then
     return 0
   fi
   
@@ -230,8 +230,8 @@ list_registry_services() {
     
     # Get list of services in this category
     local services
-    services=$(_run_yaml_parser get_keys "$f" "endpoints.$category" 2>/dev/null)
-    if [ $? -ne 0 ] || [ -z "$services" ]; then
+    services=$(_run_yaml_parser get_keys "$f" "endpoints.$category" 2>/dev/null) || true
+    if [ -z "$services" ]; then
       continue
     fi
     
