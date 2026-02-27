@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1](https://github.com/KoninMikhail/swarmcli/compare/v0.2.0...v0.2.1) (2026-02-27)
+
+
+### Features
+
+* add version bump script and fix version sync ([463b87c](https://github.com/KoninMikhail/swarmcli/commit/463b87c3e8db6b886650ab7614522c1714ab65a8))
+* initial open-source release v0.2.0 ([1420e8f](https://github.com/KoninMikhail/swarmcli/commit/1420e8f591574d1eca18dd4f1f281e04b1b331ff))
+
+
+### Bug Fixes
+
+* resolve shellcheck warnings across shell scripts ([5e1d2b4](https://github.com/KoninMikhail/swarmcli/commit/5e1d2b4fd1d9a10d769d0ce06d4406e20bfe979e))
+* resolve shellcheck warnings in install.sh and uninstall.sh ([6db3b62](https://github.com/KoninMikhail/swarmcli/commit/6db3b62b9cdd896def28434c51dfe98edeedb54b))
+
+
+### Build
+
+* **deps:** update actions/checkout v6.0.2, actions/setup-python v6.2.0, markupsafe &lt;4.0 ([8f8747e](https://github.com/KoninMikhail/swarmcli/commit/8f8747e6d9694e3ef110bec758880433e6af7732))
+
 ## [Unreleased]
 
 ## [0.2.0] - 2026-02-27
