@@ -113,7 +113,7 @@
 set -euo pipefail
 
 # Version info
-VERSION="0.1.0"
+VERSION="0.2.0"
 BUILD_DATE="2026-02-26"
 
 # Resolve paths
