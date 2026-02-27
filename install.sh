@@ -401,7 +401,8 @@ create_config() {
     
     # Create backup if exists
     if [ -f "$CONFIG_FILE" ]; then
-        local backup="${CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+        local backup
+        backup="${CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
         cp "$CONFIG_FILE" "$backup"
         print_info "Backup created: $backup"
     fi
@@ -443,7 +444,8 @@ create_config() {
 
 setup_directories() {
     # Default paths outside swarmcli for isolation
-    local secrets_dir="$(dirname "$SCRIPT_DIR")/secrets"
+    local secrets_dir
+    secrets_dir="$(dirname "$SCRIPT_DIR")/secrets"
     local locks_dir="$SCRIPT_DIR/.locks"
     
     # Try to read paths from .swarmcli.yaml
@@ -520,7 +522,8 @@ setup_local_symlink() {
         [ ! -d "$target_dir" ] && print_dry "mkdir -p $target_dir"
         print_dry "ln -s $swarm_script $target_path"
         if ! echo "$PATH" | grep -q "$target_dir"; then
-            local shell_rc=$(get_shell_rc)
+            local shell_rc
+            shell_rc=$(get_shell_rc)
             [ -n "$shell_rc" ] && print_dry "Add PATH to $shell_rc"
         fi
         return 0

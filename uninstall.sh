@@ -353,7 +353,8 @@ remove_config() {
     fi
     
     # Create backup
-    local backup="${CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    local backup
+    backup="${CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
     cp "$CONFIG_FILE" "$backup"
     print_info "Backup saved: $backup"
     
@@ -373,8 +374,6 @@ show_usage() {
 }
 
 show_summary() {
-    local removed=("$@")
-    
     echo ""
     echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════╗${NC}"
     
@@ -583,7 +582,8 @@ main() {
     if [ ${#FOUND_PATH_EXPORTS[@]} -gt 0 ]; then
         for rc in "${FOUND_PATH_EXPORTS[@]}"; do
             # Skip if already processed for alias
-            if [[ " ${FOUND_ALIASES[*]} " =~ " ${rc} " ]]; then
+            local rc_pattern=" ${rc} "
+            if [[ " ${FOUND_ALIASES[*]} " =~ $rc_pattern ]]; then
                 continue
             fi
             if ask_yes_no "Remove PATH export from $rc?" "y"; then
