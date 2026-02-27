@@ -174,7 +174,8 @@ sync_repo_for_service() {
     tmp_err=$(mktemp)
     _sync_tmp_err="$tmp_err"
     if ! retry_with_backoff git clone "$auth_url" "$path" >/dev/null 2>"$tmp_err"; then
-      local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
+      local sanitized_err
+      sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
       rm -f "$tmp_err"; _sync_tmp_err=""
       add_error "git clone failed for $svc after retries: $sanitized_err"
       return 2
@@ -207,7 +208,8 @@ sync_repo_for_service() {
       # If branch fetch fails, try fetching all refs
       log warn "could not fetch branch $branch, trying to fetch all refs"
       if ! retry_with_backoff git -C "$path" fetch "$auth_url" --prune --all >/dev/null 2>"$tmp_err"; then
-        local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
+        local sanitized_err
+        sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
         rm -f "$tmp_err"
         add_error "git fetch failed for $svc branch $branch after retries: $sanitized_err"
         return 2
@@ -228,7 +230,8 @@ sync_repo_for_service() {
     
     log info "checking out commit $commit_sha for $svc"
     if ! git -C "$path" checkout "$commit_sha" >/dev/null 2>"$tmp_err"; then
-      local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
+      local sanitized_err
+      sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
       rm -f "$tmp_err"
       add_error "git checkout failed for $svc commit $commit_sha: $sanitized_err"
       return 2
@@ -237,7 +240,8 @@ sync_repo_for_service() {
     # Regular fetch for branch checkout
     # Fetch specific branch to ensure we have the latest remote state
     if ! retry_with_backoff git -C "$path" fetch "$auth_url" "$branch" --prune >/dev/null 2>"$tmp_err"; then
-      local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err" 2>/dev/null || echo "unknown error")")
+      local sanitized_err
+      sanitized_err=$(sanitize_git_error "$(cat "$tmp_err" 2>/dev/null || echo "unknown error")")
       rm -f "$tmp_err"
       log error "git fetch failed for $svc branch $branch: $sanitized_err"
       add_error "git fetch failed for $svc branch $branch after retries: $sanitized_err"
@@ -254,7 +258,8 @@ sync_repo_for_service() {
     # stale local branch issue where 'git checkout branch' would use
     # outdated local tracking branch instead of fresh remote state
     if ! git -C "$path" checkout FETCH_HEAD >/dev/null 2>"$tmp_err"; then
-      local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err" 2>/dev/null || echo "unknown error")")
+      local sanitized_err
+      sanitized_err=$(sanitize_git_error "$(cat "$tmp_err" 2>/dev/null || echo "unknown error")")
       rm -f "$tmp_err"
       log error "git checkout failed for $svc branch $branch: $sanitized_err"
       add_error "git checkout failed for $svc branch $branch: $sanitized_err"
@@ -272,22 +277,27 @@ sync_repo_for_service() {
 # Returns: 0 on success, non-zero on error
 sync_repo_for_service_info() {
   local stack="$1" svc="$2" branch="$3" commit_sha="${4:-}"
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   
   # Check if external
   if ! is_service_internal "$stack" "$svc"; then
     # Sync external image
     local error_msg=""
     if ! sync_external_image "$stack" "$svc" 2>&1; then
-      local end_ts=$(date +%s)
-      local duration=$((end_ts - start_ts))
+      local end_ts
+      end_ts=$(date +%s)
+      local duration
+      duration=$((end_ts - start_ts))
       error_msg="${ERROR_STACK[${#ERROR_STACK[@]}-1]:-sync failed}"
       echo "status=failed;type=external;error=$error_msg;time=$duration"
       return 2
     fi
     
-    local end_ts=$(date +%s)
-    local duration=$((end_ts - start_ts))
+    local end_ts
+    end_ts=$(date +%s)
+    local duration
+    duration=$((end_ts - start_ts))
     local full_image
     full_image="$(get_service_field "$stack" "$svc" image 2>/dev/null || echo "")"
     local image_name tag
@@ -310,16 +320,20 @@ sync_repo_for_service_info() {
   # Run sync (suppress output for tree mode)
   local error_msg=""
   if ! sync_repo_for_service "$stack" "$svc" "$branch" "$commit_sha" 2>&1; then
-    local end_ts=$(date +%s)
-    local duration=$((end_ts - start_ts))
+    local end_ts
+    end_ts=$(date +%s)
+    local duration
+    duration=$((end_ts - start_ts))
     # Get last error from error stack
     error_msg="${ERROR_STACK[${#ERROR_STACK[@]}-1]:-sync failed}"
     echo "status=failed;action=$action;branch=$branch;error=$error_msg;time=$duration"
     return 2
   fi
   
-  local end_ts=$(date +%s)
-  local duration=$((end_ts - start_ts))
+  local end_ts
+  end_ts=$(date +%s)
+  local duration
+  duration=$((end_ts - start_ts))
   
   # Get commit info
   local sha current_branch
@@ -412,7 +426,8 @@ validate_repo_access() {
     rm -f "$tmp_err"
     return 0
   else
-    local sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
+    local sanitized_err
+    sanitized_err=$(sanitize_git_error "$(cat "$tmp_err")")
     rm -f "$tmp_err"
     add_error "cannot access repo $repo after retries: $sanitized_err"
     return 1

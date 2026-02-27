@@ -103,7 +103,8 @@ cmd_list() {
           
           local type_padding=""
           local type_len=${#service_type_text}
-          local padding_needed=$((10 - type_len))
+          local padding_needed
+          padding_needed=$((10 - type_len))
           if [ $padding_needed -gt 0 ]; then
             type_padding=$(printf "%*s" $padding_needed "")
           fi
@@ -224,7 +225,8 @@ cmd_ps_all() {
         services_count=$(docker stack services "$stack" --format "{{.Name}}" 2>/dev/null | wc -l)
         
         # Check services health
-        local running=$(docker stack services "$stack" --format "{{.Replicas}}" 2>/dev/null | grep -c "^[1-9]" || echo "0")
+        local running
+        running=$(docker stack services "$stack" --format "{{.Replicas}}" 2>/dev/null | grep -c "^[1-9]" || echo "0")
         
         if [ "$running" -eq "$services_count" ] && [ "$services_count" -gt 0 ]; then
           status="$(c 32 "running")"
@@ -243,7 +245,8 @@ cmd_ps_all() {
       fi
       
       # Padding for colored text
-      local padding_needed=$((10 - ${#status_text}))
+      local padding_needed
+      padding_needed=$((10 - ${#status_text}))
       local status_padding=""
       if [ $padding_needed -gt 0 ]; then
         status_padding=$(printf "%*s" $padding_needed "")

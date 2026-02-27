@@ -67,7 +67,8 @@ run_hook() {
       return 0
     fi
     
-    local start_ts=$(date +%s)
+    local start_ts
+    start_ts=$(date +%s)
     
     if [ $use_bash_fallback -eq 1 ]; then
       STACK="$stack" SWARM_PROFILE="$ACTIVE_PROFILE" bash "$hook_path" "$stack" 2>&1 | while IFS= read -r line; do
@@ -82,8 +83,10 @@ run_hook() {
     fi
     
     local rc=${ps[0]}
-    local end_ts=$(date +%s)
-    local duration=$((end_ts - start_ts))
+    local end_ts
+    end_ts=$(date +%s)
+    local duration
+    duration=$((end_ts - start_ts))
     
     if [ $rc -ne 0 ]; then
       add_error "hook $hook_name failed with exit code $rc"
@@ -103,7 +106,8 @@ run_hook() {
     return 0
   fi
   
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   
   if [ $use_bash_fallback -eq 1 ]; then
     STACK="$stack" SWARM_PROFILE="$ACTIVE_PROFILE" bash "$hook_path" "$stack" 2>&1 | while IFS= read -r line; do
@@ -118,8 +122,10 @@ run_hook() {
   fi
   
   local rc=${ps[0]}
-  local end_ts=$(date +%s)
-  local duration=$((end_ts - start_ts))
+  local end_ts
+  end_ts=$(date +%s)
+  local duration
+  duration=$((end_ts - start_ts))
   
   if [ $rc -ne 0 ]; then
     add_error "hook $hook_name failed with exit code $rc"

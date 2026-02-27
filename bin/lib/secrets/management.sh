@@ -9,7 +9,8 @@ secrets_manifest_iter() {
   [ -d "$secrets_dir" ] || return 0
   
   find "$secrets_dir" -maxdepth 1 -type f 2>/dev/null | while IFS= read -r filepath; do
-    local filename=$(basename "$filepath")
+    local filename
+    filename=$(basename "$filepath")
     
     # Skip hidden files
     case "$filename" in

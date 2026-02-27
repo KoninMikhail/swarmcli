@@ -63,7 +63,8 @@ save_config_mapping() {
   echo "${base_name}=${actual_name}" >> "$mapping_file"
   
   # Also export as environment variable for templates.py
-  local var_name="CONFIG_NAME_$(echo "$base_name" | tr '[:lower:]-' '[:upper:]_')"
+  local var_name
+  var_name="CONFIG_NAME_$(echo "$base_name" | tr '[:lower:]-' '[:upper:]_')"
   export "$var_name"="$actual_name"
 }
 

@@ -49,7 +49,8 @@ cmd_validate_tree() {
   stack_dir="$(get_current_stack_dir "$stack")"
   
   local errors=0
-  local start_ms=$(now_ms)
+  local start_ms
+  start_ms=$(now_ms)
   
   # Header
   printf "\n$(c 90 "─────────────────────────────────────────────────────────────")\n"
@@ -143,7 +144,8 @@ cmd_validate_tree() {
     
     for svc in "${services_arr[@]}"; do
       idx=$((idx + 1))
-      local is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
+      local is_last_svc
+      is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
       
       # Service name
       if [ "$is_last_svc" = "1" ]; then
@@ -233,7 +235,8 @@ cmd_validate_tree() {
       done
       
       local missing_count=${#missing_secrets[@]}
-      local present_count=$((total - missing_count))
+      local present_count
+      present_count=$((total - missing_count))
       
       if [ $missing_count -eq 0 ]; then
         # All secrets present - show only count
@@ -249,7 +252,8 @@ cmd_validate_tree() {
         local idx=0
         for sec in "${missing_secrets[@]}"; do
           idx=$((idx + 1))
-          local is_last=$( [ $idx -eq $missing_count ] && echo "1" || echo "0" )
+          local is_last
+          is_last=$( [ $idx -eq $missing_count ] && echo "1" || echo "0" )
           _tree_item "$sec_prefix$_tree_space" "$is_last" "$(c 31 "•")" "$sec"
         done
       fi
@@ -295,7 +299,8 @@ cmd_validate_tree() {
       done
       
       local missing_count=${#missing_files[@]}
-      local present_count=$((total - missing_count))
+      local present_count
+      present_count=$((total - missing_count))
       
       if [ $missing_count -eq 0 ]; then
         _tree_item "$cfg_prefix" "1" "$(c 32 "✓")" "All config files present ($total, strategy: $strategy)"
@@ -308,7 +313,8 @@ cmd_validate_tree() {
         local idx=0
         for cfg in "${missing_files[@]}"; do
           idx=$((idx + 1))
-          local is_last=$( [ $idx -eq $missing_count ] && echo "1" || echo "0" )
+          local is_last
+          is_last=$( [ $idx -eq $missing_count ] && echo "1" || echo "0" )
           _tree_item "$cfg_prefix$_tree_space" "$is_last" "$(c 31 "•")" "$cfg"
         done
       fi
@@ -318,8 +324,10 @@ cmd_validate_tree() {
   fi
   
   # ===== Result =====
-  local end_ms=$(now_ms)
-  local duration=$((end_ms - start_ms))
+  local end_ms
+  end_ms=$(now_ms)
+  local duration
+  duration=$((end_ms - start_ms))
   
   if [ $errors -eq 0 ]; then
     printf "✅ $(c 32 "Validation completed") in %dms\n" "$duration"
@@ -351,22 +359,26 @@ cmd_validate() {
   
   # Verbose mode: plain CLI output
   if [ "$VERBOSE" = "1" ]; then
-    local start_ms=$(now_ms)
+    local start_ms
+    start_ms=$(now_ms)
     
     log info "validating stack: $stack (profile: $ACTIVE_PROFILE)"
     
     if ! validate_stack_all "$stack"; then
-      local end_ms=$(now_ms)
+      local end_ms
+      end_ms=$(now_ms)
       output_result "error" "validate" $((end_ms - start_ms)) "configuration validation failed"
       return 1
     fi
     
     if validate_deploy_prerequisites "$stack"; then
-      local end_ms=$(now_ms)
+      local end_ms
+      end_ms=$(now_ms)
       output_result "success" "validate" $((end_ms - start_ms)) "all checks passed"
       return 0
     else
-      local end_ms=$(now_ms)
+      local end_ms
+      end_ms=$(now_ms)
       output_result "error" "validate" $((end_ms - start_ms)) "validation failed"
       return 1
     fi

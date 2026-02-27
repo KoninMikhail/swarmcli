@@ -316,7 +316,7 @@ load_variables_yaml() {
   esac
   
   tmpfile=$(mktemp) || return 1
-  trap "rm -f '$tmpfile'" RETURN
+  trap 'rm -f "'"$tmpfile"'"' RETURN
   
   # First, load GitLab CI variables with prefixes (highest priority)
   if [ -n "$prefix" ]; then

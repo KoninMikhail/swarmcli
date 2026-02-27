@@ -75,7 +75,8 @@ _run_build_parallel() {
   local batch_size=4
   local current_batch=0
   local batch_num=1
-  local total_batches=$(( (total + batch_size - 1) / batch_size ))
+  local total_batches
+  total_batches=$(( (total + batch_size - 1) / batch_size ))
   
   # Ensure log directory exists
   local build_log_dir="${HOME}/.swarm-deploy/logs"
@@ -88,9 +89,11 @@ _run_build_parallel() {
     local pids=()
     local log_files=()
     local service_names=()
-    local batch_end=$((current_batch + batch_size))
+    local batch_end
+    batch_end=$((current_batch + batch_size))
     [ $batch_end -gt $total ] && batch_end=$total
-    local batch_count=$((batch_end - current_batch))
+    local batch_count
+    batch_count=$((batch_end - current_batch))
     
     log info "batch $batch_num/$total_batches: building $batch_count service(s)..."
     
@@ -185,7 +188,8 @@ _run_build_parallel() {
 
 # Command: swarmcli repos sync <stack>
 cmd_repos_sync() {
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   local stack="$1"
   local tree_mode="${SYNC_TREE:-0}"
   local verbose_mode="${VERBOSE:-0}"
@@ -217,7 +221,8 @@ cmd_repos_sync() {
     exit $rc
   fi
   
-  local end_ts=$(date +%s)
+  local end_ts
+  end_ts=$(date +%s)
   log ok "repos sync completed in $((end_ts-start_ts))s"
 }
 
@@ -250,7 +255,8 @@ _sync_tree_item() {
 cmd_repos_sync_tree() {
   local stack="$1"
   local verbose="${2:-0}"
-  local start_ms=$(now_ms)
+  local start_ms
+  start_ms=$(now_ms)
   
   local stack_dir
   stack_dir="$(get_current_stack_dir "$stack")"
@@ -293,7 +299,8 @@ cmd_repos_sync_tree() {
   local idx=0
   for svc in "${services_arr[@]}"; do
     idx=$((idx + 1))
-    local is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
+    local is_last_svc
+    is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
     
     # Service name line
     if [ "$is_last_svc" = "1" ]; then
@@ -400,9 +407,12 @@ cmd_repos_sync_tree() {
   printf "\n"
   
   # Result
-  local end_ms=$(now_ms)
-  local duration_ms=$((end_ms - start_ms))
-  local duration_s=$((duration_ms / 1000))
+  local end_ms
+  end_ms=$(now_ms)
+  local duration_ms
+  duration_ms=$((end_ms - start_ms))
+  local duration_s
+  duration_s=$((duration_ms / 1000))
   
   if [ $errors -eq 0 ]; then
     printf "✅ $(c 32 "Sync completed") in %ds (%d synced, %d skipped)\n\n" "$duration_s" "$synced" "$skipped"
@@ -446,7 +456,8 @@ _build_tree_item() {
 cmd_build_tree() {
   local stack="$1"
   local verbose="${2:-0}"
-  local start_ms=$(now_ms)
+  local start_ms
+  start_ms=$(now_ms)
   
   # Load services registry (generates SERVICE_* variables from endpoints.yaml)
   # Required for variable substitution in build variables
@@ -498,7 +509,8 @@ cmd_build_tree() {
   local idx=0
   for svc in "${services_arr[@]}"; do
     idx=$((idx + 1))
-    local is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
+    local is_last_svc
+    is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
     
     # Service name line
     if [ "$is_last_svc" = "1" ]; then
@@ -589,9 +601,12 @@ cmd_build_tree() {
   printf "\n"
   
   # Result
-  local end_ms=$(now_ms)
-  local duration_ms=$((end_ms - start_ms))
-  local duration_s=$((duration_ms / 1000))
+  local end_ms
+  end_ms=$(now_ms)
+  local duration_ms
+  duration_ms=$((end_ms - start_ms))
+  local duration_s
+  duration_s=$((duration_ms / 1000))
   
   if [ $errors -eq 0 ]; then
     printf "✅ $(c 32 "Build completed") in %ds (%d built, %d skipped)\n\n" "$duration_s" "$built" "$skipped"

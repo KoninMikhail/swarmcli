@@ -53,7 +53,7 @@ log_json() {
   if [ -n "$extra_fields" ]; then
     local base_json
     base_json=$(jq -n --arg ts "$(now_iso)" --arg level "$level" --arg msg "$msg" '{ts: $ts, level: $level, msg: $msg}')
-    echo "$base_json" | jq --argjson extra "{$extra_fields}" '. + $extra' 2>/dev/null >&$out_fd || \
+    echo "$base_json" | jq --argjson extra "{$extra_fields}" '. + $extra' 2>/dev/null 1>&$out_fd || \
       echo "$base_json" >&$out_fd
   else
     jq -n \
@@ -141,7 +141,7 @@ log_section_result() {
   [ "$QUIET" = "1" ] && return
   
   if [ "$status" = "ok" ]; then
-    printf "   %s %s\n" "$(icon done)" "$(c 32 "$msg")"
+    printf "   %s %s\n" "$(icon "done")" "$(c 32 "$msg")"
   else
     printf "   %s %s\n" "$(icon fail)" "$(c 31 "$msg")"
   fi

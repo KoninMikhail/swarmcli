@@ -76,7 +76,8 @@ rebuild_service_at_commit() {
   export DOCKER_BUILDKIT=1
   export BUILDKIT_PROGRESS=plain
   
-  local cache_bust="${sha}-$(date +%s)"
+  local cache_bust
+  cache_bust="${sha}-$(date +%s)"
   ba_flags+=("--build-arg" "CACHE_BUST=${cache_bust}")
   
   _rebuild_cmd() {

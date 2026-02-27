@@ -37,12 +37,14 @@ wait_for_services_ready() {
     log info "waiting for services to be ready (timeout: ${timeout}s)"
   fi
   
-  local start_time=$(date +%s)
-  local end_time=$((start_time + timeout))
+  local start_time
+  start_time=$(date +%s)
+  local end_time
+  end_time=$((start_time + timeout))
   local all_ready=0
   local check_count=0
   
-  while [ $(date +%s) -lt $end_time ]; do
+  while [ "$(date +%s)" -lt "$end_time" ]; do
     # Check for cancellation at the start of each iteration
     if declare -f check_cancellation_requested >/dev/null 2>&1; then
       check_cancellation_requested "$stack" || return 130
@@ -150,8 +152,10 @@ wait_for_services_ready() {
     fi
     
     if [ "$should_show_status" = "1" ]; then
-      local elapsed=$(( $(date +%s) - start_time ))
-      local remaining=$((timeout - elapsed))
+      local elapsed
+      elapsed=$(( $(date +%s) - start_time ))
+      local remaining
+      remaining=$((timeout - elapsed))
       
       if [ ${#waiting_services[@]} -gt 0 ]; then
         log info "waiting for ${#waiting_services[@]} service(s) to become ready (${elapsed}s/${timeout}s)"

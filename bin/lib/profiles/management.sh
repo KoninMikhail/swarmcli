@@ -179,7 +179,8 @@ load_profile() {
   # Export profile-related paths
   export ACTIVE_PROFILE="$profile"
   export PROFILE_DIR="$profile_dir"
-  export PROFILE_STACKS_DIR="$(get_profile_stacks_dir "$profile")"
+  PROFILE_STACKS_DIR="$(get_profile_stacks_dir "$profile")"
+  export PROFILE_STACKS_DIR
   
   # Load config values
   local name description
@@ -190,11 +191,14 @@ load_profile() {
   export PROFILE_DESCRIPTION="$description"
   
   # Swarm settings
-  export SERVICES_READY_TIMEOUT=$(get_profile_config "$profile" "swarm.services_ready_timeout" "${SERVICES_READY_TIMEOUT:-30}")
-  export KEEP_IMAGES_COUNT=$(get_profile_config "$profile" "swarm.keep_images_count" "${KEEP_IMAGES_COUNT:-10}")
+  SERVICES_READY_TIMEOUT=$(get_profile_config "$profile" "swarm.services_ready_timeout" "${SERVICES_READY_TIMEOUT:-30}")
+  export SERVICES_READY_TIMEOUT
+  KEEP_IMAGES_COUNT=$(get_profile_config "$profile" "swarm.keep_images_count" "${KEEP_IMAGES_COUNT:-10}")
+  export KEEP_IMAGES_COUNT
   
   # Git settings
-  export DEFAULT_BRANCH=$(get_profile_config "$profile" "git.default_branch" "${DEFAULT_BRANCH:-main}")
+  DEFAULT_BRANCH=$(get_profile_config "$profile" "git.default_branch" "${DEFAULT_BRANCH:-main}")
+  export DEFAULT_BRANCH
   local git_user git_token
   git_user=$(get_profile_config "$profile" "git.http_user" "")
   git_token=$(get_profile_config "$profile" "git.http_token" "")
@@ -216,9 +220,12 @@ load_profile() {
     export RETRY_ENABLED=0
   fi
   
-  export RETRY_MAX_ATTEMPTS=$(get_profile_config "$profile" "retry.max_attempts" "${RETRY_MAX_ATTEMPTS:-3}")
-  export RETRY_INITIAL_DELAY=$(get_profile_config "$profile" "retry.initial_delay" "${RETRY_INITIAL_DELAY:-2}")
-  export RETRY_MAX_DELAY=$(get_profile_config "$profile" "retry.max_delay" "${RETRY_MAX_DELAY:-30}")
+  RETRY_MAX_ATTEMPTS=$(get_profile_config "$profile" "retry.max_attempts" "${RETRY_MAX_ATTEMPTS:-3}")
+  export RETRY_MAX_ATTEMPTS
+  RETRY_INITIAL_DELAY=$(get_profile_config "$profile" "retry.initial_delay" "${RETRY_INITIAL_DELAY:-2}")
+  export RETRY_INITIAL_DELAY
+  RETRY_MAX_DELAY=$(get_profile_config "$profile" "retry.max_delay" "${RETRY_MAX_DELAY:-30}")
+  export RETRY_MAX_DELAY
   
   log detail "loaded profile: $profile"
   

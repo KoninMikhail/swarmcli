@@ -114,7 +114,8 @@ build_for_service() {
   export BUILDKIT_PROGRESS=plain
   
   # Add CACHE_BUST build arg
-  local cache_bust="${shortsha}-$(date +%s)"
+  local cache_bust
+  cache_bust="${shortsha}-$(date +%s)"
   build_args+=("--build-arg" "CACHE_BUST=${cache_bust}")
   
   if [ "$NO_CACHE" = "1" ]; then
@@ -215,7 +216,8 @@ build_for_service() {
 # Returns: 0 on success, non-zero on error
 build_for_service_info() {
   local stack="$1" svc="$2" branch="$3"
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   
   # Check if external
   if ! is_service_internal "$stack" "$svc"; then
@@ -240,7 +242,8 @@ build_for_service_info() {
   
   # Check if image exists (skip unless force)
   if [ "$FORCE_REBUILD" != "1" ] && image_tag_exists "$image" "$tag"; then
-    local end_ts=$(date +%s)
+    local end_ts
+    end_ts=$(date +%s)
     echo "status=skipped;reason=exists;image=$image;tag=$tag;time=$((end_ts - start_ts))"
     return 0
   fi
@@ -263,8 +266,10 @@ build_for_service_info() {
     build_rc=$?
   fi
   
-  local end_ts=$(date +%s)
-  local duration=$((end_ts - start_ts))
+  local end_ts
+  end_ts=$(date +%s)
+  local duration
+  duration=$((end_ts - start_ts))
   
   if [ $build_rc -eq 0 ]; then
     echo "status=ok;action=$build_method;image=$image;tag=$tag;time=$duration"

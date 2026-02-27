@@ -2,7 +2,8 @@
 # Deploy commands
 
 cmd_deploy() {
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   local stack="$1"
   shift || true
   
@@ -18,7 +19,8 @@ cmd_deploy() {
   
   # Initialize step time tracking
   clear_step_times
-  local step_start_ts=$(date +%s)
+  local step_start_ts
+  step_start_ts=$(date +%s)
   
   # Determine total steps (depends on flags)
   local total_steps=5  # validate, templates, deploy, verify, complete
@@ -384,8 +386,10 @@ cmd_deploy() {
     printf "$(c 32 "✓") cleanup completed\n"
   fi
   
-  local end_ts=$(date +%s)
-  local duration=$((end_ts-start_ts))
+  local end_ts
+  end_ts=$(date +%s)
+  local duration
+  duration=$((end_ts-start_ts))
   
   # Clear operation context (graceful shutdown)
   if declare -f clear_operation_context >/dev/null 2>&1; then

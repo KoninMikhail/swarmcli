@@ -41,7 +41,8 @@ _run_build_parallel() {
   local batch_size=4
   local current_batch=0
   local batch_num=1
-  local total_batches=$(( (total + batch_size - 1) / batch_size ))
+  local total_batches
+  total_batches=$(( (total + batch_size - 1) / batch_size ))
   
   # Ensure log directory exists
   local build_log_dir="${HOME}/.swarm-deploy/logs"
@@ -54,9 +55,11 @@ _run_build_parallel() {
     local pids=()
     local log_files=()
     local service_names=()
-    local batch_end=$((current_batch + batch_size))
+    local batch_end
+    batch_end=$((current_batch + batch_size))
     [ $batch_end -gt $total ] && batch_end=$total
-    local batch_count=$((batch_end - current_batch))
+    local batch_count
+    batch_count=$((batch_end - current_batch))
     
     log info "batch $batch_num/$total_batches: building $batch_count service(s)..."
     
@@ -152,7 +155,8 @@ _run_build_parallel() {
 # Command: swarmcli repos sync <stack>
 # Tree mode is default, --verbose switches to plain CLI output
 cmd_repos_sync() {
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   local stack="$1"
   shift || true
   
@@ -174,7 +178,8 @@ cmd_repos_sync() {
     local rc=$?
     [ $rc -eq 0 ] || exit $rc
     
-    local end_ts=$(date +%s)
+    local end_ts
+    end_ts=$(date +%s)
     log ok "repos sync completed in $((end_ts-start_ts))s"
     return $rc
   fi
@@ -212,7 +217,8 @@ _sync_tree_item() {
 # Usage: cmd_repos_sync_tree <stack>
 cmd_repos_sync_tree() {
   local stack="$1"
-  local start_ms=$(now_ms)
+  local start_ms
+  start_ms=$(now_ms)
   
   local stack_dir
   stack_dir="$(get_current_stack_dir "$stack")"
@@ -254,7 +260,8 @@ cmd_repos_sync_tree() {
   local idx=0
   for svc in "${services_arr[@]}"; do
     idx=$((idx + 1))
-    local is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
+    local is_last_svc
+    is_last_svc=$( [ $idx -eq $total ] && echo "1" || echo "0" )
     
     # Service name line
     if [ "$is_last_svc" = "1" ]; then
@@ -347,9 +354,12 @@ cmd_repos_sync_tree() {
   done
   
   # Result
-  local end_ms=$(now_ms)
-  local duration_ms=$((end_ms - start_ms))
-  local duration_s=$((duration_ms / 1000))
+  local end_ms
+  end_ms=$(now_ms)
+  local duration_ms
+  duration_ms=$((end_ms - start_ms))
+  local duration_s
+  duration_s=$((duration_ms / 1000))
   
   if [ $errors -eq 0 ]; then
     printf "✅ $(c 32 "Sync completed") in %ds (%d synced, %d skipped)\n" "$duration_s" "$synced" "$skipped"
@@ -369,7 +379,8 @@ cmd_repos_sync_tree() {
 #   --no-cache  Disable Docker build cache
 #   --verbose   Show all logs (default: shows build output)
 cmd_build() {
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   local stack="$1"
   shift || true
   
@@ -407,7 +418,8 @@ cmd_build() {
   local rc=$?
   [ $rc -eq 0 ] || exit $rc
   
-  local end_ts=$(date +%s)
+  local end_ts
+  end_ts=$(date +%s)
   printf "✅ $(c 32 "Build completed") in %ds\n" "$((end_ts-start_ts))"
 }
 
@@ -415,7 +427,8 @@ cmd_build() {
 # Usage: cmd_build_with_output <stack>
 cmd_build_with_output() {
   local stack="$1"
-  local start_ms=$(now_ms)
+  local start_ms
+  start_ms=$(now_ms)
   
   # Collect services info
   local services
@@ -485,14 +498,17 @@ cmd_build_with_output() {
     branch="$(resolve_branch "$stack" "$svc")"
     
     # Run build with full output
-    local build_start=$(date +%s)
+    local build_start
+    build_start=$(date +%s)
     if build_for_service "$stack" "$svc" "$branch"; then
-      local build_duration=$(($(date +%s) - build_start))
+      local build_duration
+      build_duration=$(($(date +%s) - build_start))
       printf "\n$(c 32 "✓") $(c 36 "%s") built in %ds\n" "$svc" "$build_duration"
       built=$((built + 1))
     else
       local build_rc=$?
-      local build_duration=$(($(date +%s) - build_start))
+      local build_duration
+      build_duration=$(($(date +%s) - build_start))
       printf "\n$(c 31 "✗") $(c 36 "%s") $(c 31 "FAILED") after %ds\n" "$svc" "$build_duration"
       errors=$((errors + 1))
       failed_services+=("$svc")

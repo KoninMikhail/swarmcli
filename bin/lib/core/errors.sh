@@ -9,7 +9,8 @@ add_error() {
   ERROR_STACK+=("$error_msg")
   
   # Update JSON field for log_json (jq ensures safe escaping)
-  export ERRORS_ACCUMULATED="$(printf '%s\0' "${ERROR_STACK[@]}" | jq -Rs 'split("\u0000") | map(select(length > 0))')"
+  ERRORS_ACCUMULATED="$(printf '%s\0' "${ERROR_STACK[@]}" | jq -Rs 'split("\u0000") | map(select(length > 0))')"
+  export ERRORS_ACCUMULATED
 }
 
 clear_errors() {

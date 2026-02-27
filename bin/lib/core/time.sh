@@ -67,7 +67,7 @@ print_deploy_summary() {
   # Verbose mode - simple summary
   if [ "$VERBOSE" = "1" ]; then
     printf "\n"
-    printf "   %s %s\n" "$(icon done)" "$(c 32 "Deploy completed successfully")"
+    printf "   %s %s\n" "$(icon "done")" "$(c 32 "Deploy completed successfully")"
     printf "   ├─ Stack: %s\n" "$stack"
     printf "   ├─ Services: %s\n" "$updated_services"
     printf "   └─ Time: %ss\n" "$duration"

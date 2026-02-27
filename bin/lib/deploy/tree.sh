@@ -7,7 +7,8 @@
 deploy_stack_tree() {
   local stack="$1"
   local compose="$2"
-  local start_ts=$(date +%s)
+  local start_ts
+  start_ts=$(date +%s)
   
   # Check compose file exists
   if [ ! -f "$compose" ]; then
@@ -82,13 +83,15 @@ wait_for_services_ready_tree() {
   
   printf "\n⏳ $(c 1 "Waiting for services") $(c 90 "(timeout: %ds)")\n" "$timeout"
   
-  local start_time=$(date +%s)
-  local end_time=$((start_time + timeout))
+  local start_time
+  start_time=$(date +%s)
+  local end_time
+  end_time=$((start_time + timeout))
   local all_ready=0
   local failed_services=()
   local ready_services=()
   
-  while [ $(date +%s) -lt $end_time ]; do
+  while [ "$(date +%s)" -lt "$end_time" ]; do
     all_ready=1
     failed_services=()
     ready_services=()
@@ -128,7 +131,8 @@ wait_for_services_ready_tree() {
     sleep 2
   done
   
-  local elapsed=$(($(date +%s) - start_time))
+  local elapsed
+  elapsed=$(($(date +%s) - start_time))
   
   # Display results
   for svc in "${services_to_check[@]}"; do
