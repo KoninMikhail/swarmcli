@@ -169,7 +169,7 @@ swarmcli use --show
 Profile is saved in `.swarmcli.yaml`:
 
 ```bash
-swarmcli config get state.default_profile
+swarmcli system config get state.default_profile
 # server-prod
 ```
 

@@ -1,0 +1,14 @@
+name: Test Server
+description: Test profile for unit tests
+swarm:
+  services_ready_timeout: 30
+  keep_images_count: 10
+git:
+  default_branch: main
+  http_user: testuser
+  http_token: testtoken
+retry:
+  enabled: true
+  max_attempts: 3
+  initial_delay: 2
+  max_delay: 30

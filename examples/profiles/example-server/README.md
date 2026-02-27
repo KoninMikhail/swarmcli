@@ -75,7 +75,7 @@ cp -r examples/profiles/example-server profiles/example-server
 
 # 2. Set Git token (required for app-backend, app-frontend)
 export GIT_HTTP_TOKEN="your-token"
-# or: swarmcli config set git.auth.http_token "your-token"
+# or: swarmcli system config set git.auth.http_token "your-token"
 
 # 3. Edit config.yaml — specify real Git URLs
 nano profiles/example-server/config.yaml

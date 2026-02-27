@@ -8,7 +8,7 @@ cmd_config_list() {
   
   if [ ! -f "$config_file" ]; then
     log info "no configuration file found at $config_file"
-    log info "run 'swarmcli config init' to create one with defaults"
+    log info "run 'swarmcli system config init' to create one with defaults"
     return 0
   fi
   
@@ -70,7 +70,7 @@ cmd_config_init() {
   
   _run_config_manager init "$config_file"
   log ok "created $config_file"
-  log info "edit with: swarmcli config edit"
+  log info "edit with: swarmcli system config edit"
 }
 
 cmd_config_reset() {
@@ -102,7 +102,7 @@ cmd_config() {
     init)       cmd_config_init ;;
     reset)      cmd_config_reset ;;
     --help|-h)
-      echo "Usage: swarmcli config <subcommand>"
+      echo "Usage: swarmcli system config <subcommand>"
       echo ""
       echo "Subcommands:"
       echo "  list           Show all configuration values"
@@ -114,9 +114,9 @@ cmd_config() {
       echo "  reset          Reset to defaults (backup created)"
       echo ""
       echo "Examples:"
-      echo "  swarmcli config set operations.log_format json"
-      echo "  swarmcli config get operations.timeout"
-      echo "  swarmcli config set git.auth.http_token \"your-token-here\""
+      echo "  swarmcli system config set operations.log_format json"
+      echo "  swarmcli system config get operations.timeout"
+      echo "  swarmcli system config set git.auth.http_token \"your-token-here\""
       ;;
     *) fail "unknown config subcommand: $sub (use: list, get, set, edit, path, init, reset)" ;;
   esac

@@ -151,7 +151,7 @@ Initial open-source release.
 - Hook environment: `$STACK`, `$SWARM_PROFILE`, `$TAG_*`, `$GLOBAL_*`, `$DEPLOY_*`
 
 #### Configuration Management
-- `swarmcli config` — view and modify `.swarmcli.yaml`
+- `swarmcli system config` — view and modify `.swarmcli.yaml`
 - `swarmcli create` — interactive wizard for profiles, stacks, and services
 - `swarmcli check` — validate stack configuration before deploy
 - `swarmcli apply` — apply config changes

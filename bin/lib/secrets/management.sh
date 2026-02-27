@@ -30,7 +30,8 @@ secret_exists() {
   docker secret ls --format '{{.Name}}' 2>/dev/null | grep -Fxq "$1"
 }
 
-# Find services that use a specific Docker secret
+# Find services that use a specific Docker secret (including versioned names)
+# Matches both exact name and versioned pattern {name}_v{timestamp}
 # Usage: _find_services_using_secret <secret_name>
 # Output: service names, one per line
 _find_services_using_secret() {
@@ -40,8 +41,26 @@ _find_services_using_secret() {
     local svc_secrets
     svc_secrets=$(docker service inspect "$svc_id" \
       --format '{{range .Spec.TaskTemplate.ContainerSpec.Secrets}}{{.SecretName}} {{end}}' 2>/dev/null || true)
-    if [[ " $svc_secrets" == *" ${secret_name} "* ]]; then
+    # Match exact name or versioned pattern {name}_v{digits}
+    if [[ " $svc_secrets" == *" ${secret_name} "* ]] || [[ " $svc_secrets" =~ " ${secret_name}_v"[0-9]+ ]]; then
       docker service inspect "$svc_id" --format '{{.Spec.Name}}' 2>/dev/null
+    fi
+  done
+}
+
+# Find the current SecretName and File.Name (target) for a base secret in a service.
+# The service may use the base name or a versioned name ({name}_v{ts}).
+# Usage: _get_secret_spec_in_service <base_name> <service_name>
+# Output: <current_secret_name> <target_file_name>
+_get_secret_spec_in_service() {
+  local base_name="$1" svc="$2"
+  docker service inspect "$svc" \
+    --format '{{range .Spec.TaskTemplate.ContainerSpec.Secrets}}{{.SecretName}} {{.File.Name}}{{"\n"}}{{end}}' 2>/dev/null \
+  | while IFS=' ' read -r sname fname; do
+    [ -n "$sname" ] || continue
+    if [ "$sname" = "$base_name" ] || [[ "$sname" =~ ^${base_name}_v[0-9]+$ ]]; then
+      echo "$sname $fname"
+      return
     fi
   done
 }
@@ -49,7 +68,8 @@ _find_services_using_secret() {
 # Atomic secret rotation via versioned name + docker service update
 # Flow:
 #   1. Create {name}_v{ts} with new content
-#   2. Update each service: --secret-rm {name} --secret-add source={name}_v{ts},target={name}
+#   2. For each service, find the current secret name (may be {name} or {name}_v{old_ts})
+#      and its target (File.Name), then --secret-rm {current} --secret-add source={name}_v{ts},target={target}
 #   3. Remove old {name} (now unused by any service)
 #   4. Re-create {name} with new content (for future docker stack deploy)
 #   5. Services keep running on {name}_v{ts} until next deploy reconciles to {name}
@@ -68,7 +88,7 @@ _rotate_secret() {
     return 1
   fi
 
-  # Step 2: find services using old secret and rotate
+  # Step 2: find services using this secret (base or versioned) and rotate
   local services
   services=$(_find_services_using_secret "$name")
   local rotated=0
@@ -76,10 +96,25 @@ _rotate_secret() {
   if [ -n "$services" ]; then
     while IFS= read -r svc; do
       [ -n "$svc" ] || continue
-      log detail "rotating secret in service $svc: $name → $new_name"
+
+      # Resolve the current secret name and target in the service
+      local spec
+      spec=$(_get_secret_spec_in_service "$name" "$svc")
+      local current_name original_target
+      current_name=$(echo "$spec" | awk '{print $1}')
+      original_target=$(echo "$spec" | awk '{print $2}')
+
+      if [ -z "$current_name" ]; then
+        current_name="$name"
+      fi
+      if [ -z "$original_target" ]; then
+        original_target="$name"
+      fi
+
+      log detail "rotating secret in service $svc: $current_name → $new_name (target: $original_target)"
       if docker service update --quiet \
-        --secret-rm "$name" \
-        --secret-add "source=${new_name},target=${name}" \
+        --secret-rm "$current_name" \
+        --secret-add "source=${new_name},target=${original_target}" \
         "$svc" >/dev/null 2>&1; then
         rotated=$((rotated + 1))
       else
@@ -91,7 +126,7 @@ _rotate_secret() {
     done <<< "$services"
   fi
 
-  # Step 3: remove old secret (now unused)
+  # Step 3: remove old base secret (now unused)
   docker secret rm "$name" >/dev/null 2>&1 || true
 
   # Step 4: re-create with original name for future docker stack deploy

@@ -1,0 +1,9 @@
+common:
+  APP_NAME: testapp
+
+runtime:
+  ENVIRONMENT: development
+  env:
+    DEBUG_MODE: "true"
+    DATABASE_HOST: localhost
+    DATABASE_PORT: "5432"

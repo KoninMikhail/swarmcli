@@ -82,3 +82,45 @@ jobs:
         run: |
           yamllint -d '{extends: relaxed, rules: {line-length: disable, truthy: disable}}' \
             examples/ .swarmcli.yaml.example
+
+  bash-tests:
+    name: Bash Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Install bats-core
+        run: |
+          sudo npm install -g bats
+          for lib in bats-support bats-assert bats-file; do
+            sudo git clone --depth 1 "https://github.com/bats-core/${lib}.git" "/usr/local/lib/${lib}"
+          done
+
+      - name: Install Python dependencies
+        run: pip install pyyaml jinja2 markupsafe
+
+      - name: Run Bash unit tests
+        run: bats tests/bash/ --recursive
+
+      - name: Run integration tests
+        run: bats tests/integration/ --recursive
+
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install pyyaml jinja2 markupsafe pytest pytest-cov
+
+      - name: Run Python tests
+        run: python -m pytest tests/python/ -v --tb=short

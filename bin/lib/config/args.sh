@@ -102,6 +102,7 @@ parse_global_args() {
         ;;
       --force)
         FORCE_REBUILD="1"
+        REMAINING_ARGS+=("$1")
         ;;
       --with-secrets)
         WITH_SECRETS="1"

@@ -160,13 +160,15 @@ swarmcli check [stack]
 
 ## Build & Deploy
 
-### sync
+### [sync](05-sync.md)
 
 Repository sync:
 
 ```bash
-swarmcli sync [stack]
+swarmcli sync [stack] [--tree] [--verbose]
 ```
+
+Aliases: `pull`, `repo sync`
 
 ### build
 

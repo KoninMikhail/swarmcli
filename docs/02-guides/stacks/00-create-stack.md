@@ -36,15 +36,15 @@ cd my-app
 
 ## Step 2: services.yaml
 
-Stack service descriptions:
+Stack service descriptions. Each service needs a `type` — either `git` (built from source), `registry` (pre-built image), or `none` (derived from a git service):
 
 ```yaml
 # services.yaml
 services:
-  # Service from Git
+  # Service built from Git (HTTPS — works for public repos without tokens)
   api:
     type: git
-    repo: git@github.com:your-org/api.git
+    repo: https://github.com/your-org/api.git
     default_branch: develop
     build:
       context: .
@@ -54,7 +54,7 @@ services:
       group: backend
       name: API Service
   
-  # Service from Registry
+  # Service from Docker Registry
   redis:
     type: registry
     image: redis:7-alpine
@@ -62,9 +62,15 @@ services:
       group: cache
 ```
 
+> **SSH also works:** `repo: git@github.com:your-org/api.git`. For private HTTPS repos, set `GIT_HTTP_TOKEN` in the environment.
+
 ## Step 3: docker-stack.yml
 
-Docker Compose file for Swarm:
+Docker Compose file for Swarm. For `type: git` services, reference the image using a `TAG_*` variable — SwarmCLI generates it automatically from the service name:
+
+- Service name is **uppercased**, hyphens become underscores
+- Format: `TAG_<SERVICE> = <profile>-<short_commit_sha>`
+- Example: service `api` → `${TAG_API}`, service `user-service` → `${TAG_USER_SERVICE}`
 
 ```yaml
 # docker-stack.yml
@@ -87,6 +93,7 @@ services:
       restart_policy:
         condition: on-failure
   
+  # Registry services use a fixed image tag (no TAG_* variable)
   redis:
     image: redis:7-alpine
     networks:
@@ -229,7 +236,7 @@ services:
 services:
   api:
     type: git
-    repo: git@github.com:your-org/api.git
+    repo: https://github.com/your-org/api.git
     image: local/api
   
   postgres:
@@ -266,32 +273,42 @@ volumes:
   pgdata:
 ```
 
-### Multi-Service Stack
+### Multi-Service Stack (API + Worker + Scheduler)
+
+Use `type: none` for derived services that share the same image:
 
 ```yaml
 # services.yaml
 services:
   api:
     type: git
-    repo: git@github.com:your-org/api.git
-    image: local/api
+    repo: https://github.com/your-org/backend.git
+    image: local/backend
   
   worker:
-    type: git
-    repo: git@github.com:your-org/api.git  # Same repo
-    build:
-      dockerfile: Dockerfile.worker
-    image: local/worker
+    type: none    # same image as api, different command
   
   scheduler:
-    type: git
-    repo: git@github.com:your-org/api.git  # Same repo
-    build:
-      dockerfile: Dockerfile.scheduler
-    image: local/scheduler
+    type: none    # same image as api, different command
   
   redis:
     type: registry
+    image: redis:7-alpine
+```
+
+```yaml
+# docker-stack.yml
+services:
+  api:
+    image: local/backend:${TAG_API}
+    command: ["./app", "serve"]
+  worker:
+    image: local/backend:${TAG_API}
+    command: ["./app", "worker"]
+  scheduler:
+    image: local/backend:${TAG_API}
+    command: ["./app", "scheduler"]
+  redis:
     image: redis:7-alpine
 ```
 
@@ -325,5 +342,6 @@ See: [Jinja2 templating](../templates/00-overview.md)
 
 ## Next Step
 
+→ [Git-Based Stack Workflow](02-git-workflow.md) — sync, build, deploy for git services
 → [Adding Services](01-add-services.md)
 → [Jinja2 templating](../templates/00-overview.md)

@@ -16,8 +16,8 @@ get_service_repo_dir() {
 # Sets _GIT_USER and _GIT_TOKEN for caller
 _get_git_credentials_for_stack() {
   local stack="${1:-}"
-  _GIT_USER="$GIT_HTTP_USER"
-  _GIT_TOKEN="$GIT_HTTP_TOKEN"
+  _GIT_USER="${GIT_HTTP_USER:-}"
+  _GIT_TOKEN="${GIT_HTTP_TOKEN:-}"
   if [ -n "$stack" ]; then
     local stack_user stack_token
     stack_user="$(get_stack_setting "$stack" "git.http_user" "")"
@@ -149,7 +149,7 @@ sync_repo_for_service() {
   # Use GIT_ASKPASS for auth (tokens not visible in ps aux)
   _setup_git_auth "$stack"
   local _sync_tmp_err=""
-  trap '_cleanup_git_auth; [ -n "$_sync_tmp_err" ] && rm -f "$_sync_tmp_err"' RETURN
+  trap '_cleanup_git_auth; [ -n "${_sync_tmp_err:-}" ] && rm -f "$_sync_tmp_err"' RETURN
   auth_url="$(_url_with_user_only "$repo" "$stack")"
   local path
   path="$(get_service_repo_dir "$stack" "$svc")"

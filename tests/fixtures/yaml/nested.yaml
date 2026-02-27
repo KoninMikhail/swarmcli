@@ -1,0 +1,10 @@
+services:
+  api:
+    image: local/api
+    enabled: true
+  worker:
+    image: redis:7-alpine
+    enabled: false
+settings:
+  timeout: 30
+  retries: 3

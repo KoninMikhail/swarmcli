@@ -1,0 +1,9 @@
+name: test-service
+version: "1.0"
+settings:
+  timeout: 30
+  retries: 3
+  enabled: true
+tags:
+  - web
+  - api
