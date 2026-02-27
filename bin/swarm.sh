@@ -7,9 +7,16 @@
 #   swarmcli --profile <profile> <command> [stack] [flags]
 #
 # System Commands:
-#   system version          Show version information
-#   system health           Check system dependencies
-#   system update [branch]  Update swarmcli from git
+#   system version              Show version information
+#   system health               Check system dependencies
+#   system update [branch]      Update swarmcli from git
+#   system config list          Show current configuration
+#   system config get <key>     Get configuration value
+#   system config set <key> <v> Set configuration value
+#   system config edit          Open config in $EDITOR
+#   system config path          Show config file path
+#   system config init          Create config with defaults
+#   system config reset         Reset config to defaults (backup created)
 #
 # Global Commands:
 #   help                    Show this help
@@ -17,12 +24,6 @@
 #   use <profile>           Set default profile (saved to .swarmcli.yaml)
 #   use --show              Show current default profile
 #   use --clear             Clear saved default profile
-#   config list             Show current configuration
-#   config get <key>        Get configuration value
-#   config set <key> <val>  Set configuration value
-#   config edit             Open config in $EDITOR
-#   config path             Show config file path
-#   config init             Create config with defaults
 #
 # Profile Commands:
 #   profile ls              List all available profiles

@@ -276,9 +276,9 @@ git:
 **CLI management:**
 
 ```bash
-swarmcli config set operations.log_format json
-swarmcli config get state.default_profile
-swarmcli config list
+swarmcli system config set operations.log_format json
+swarmcli system config get state.default_profile
+swarmcli system config list
 ```
 
 **Profile variables** (e.g., `PLATFORM_ENV`, `METRICS_ENABLED`) are stored in `profiles/<profile>/stacks/globals.yaml`.

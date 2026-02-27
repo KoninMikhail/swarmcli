@@ -262,9 +262,9 @@ git:
 **CLI management:**
 
 ```bash
-swarmcli config set git.auth.http_token "your-token"
-swarmcli config get state.default_profile
-swarmcli config list
+swarmcli system config set git.auth.http_token "your-token"
+swarmcli system config get state.default_profile
+swarmcli system config list
 ```
 
 ⚠️ Add `.swarmcli.yaml` to `.gitignore` if storing secrets in `git.auth`!

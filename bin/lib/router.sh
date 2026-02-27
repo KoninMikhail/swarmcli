@@ -21,8 +21,6 @@ resolve_command_alias() {
     secrets) echo "secret" ;;
     locks) echo "lock" ;;
     repos) echo "repo" ;;
-    cfg) echo "config" ;;
-    
     *) echo "$cmd" ;;
   esac
 }
@@ -130,7 +128,8 @@ route_command() {
         version) cmd_version ;;
         health) cmd_check_deps ;;
         update) cmd_self_update "$@" ;;
-        *) fail "unknown system subcommand: $sub (use: version, health, update)" ;;
+        config) cmd_config "$@" ;;
+        *) fail "unknown system subcommand: $sub (use: version, health, update, config)" ;;
       esac
       ;;
       
@@ -144,10 +143,6 @@ route_command() {
     use)
       cmd_use "$@"
       ;;
-    config|cfg)
-      cmd_config "$@"
-      ;;
-      
     # ====== Profile commands ======
     profile)
       local sub="${1:-ls}"
