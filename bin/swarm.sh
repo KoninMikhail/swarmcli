@@ -114,7 +114,7 @@
 set -euo pipefail
 
 # Version info
-VERSION="0.2.1" # x-release-please-version
+VERSION="0.2.2" # x-release-please-version
 BUILD_DATE="2026-02-26"
 
 # Resolve paths
