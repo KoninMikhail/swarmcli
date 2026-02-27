@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  api:
+    image: ${IMAGE}
+    environment:
+      - NODE_ENV=${ENVIRONMENT}
+  postgres:
+    image: postgres:16

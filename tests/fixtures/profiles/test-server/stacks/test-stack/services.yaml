@@ -1,0 +1,15 @@
+services:
+  api:
+    image: local/api
+    repo: https://github.com/test/api.git
+    meta:
+      group: core
+      name: API Service
+  worker:
+    image: local/worker
+    repo: https://github.com/test/worker.git
+    meta:
+      group: core
+      name: Worker Service
+  postgres:
+    image: postgres:16

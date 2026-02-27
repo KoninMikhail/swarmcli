@@ -1,0 +1,9 @@
+endpoints:
+  internal:
+    api:
+      host: api.local
+      port: 8080
+    database:
+      host: db.local
+      port: 5432
+      database: testdb
