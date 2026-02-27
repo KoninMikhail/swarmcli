@@ -2,8 +2,11 @@
 """
 SwarmCLI version bump script.
 
-Reads the current version from the VERSION file and updates all references
+Reads the current version from version.txt and updates all references
 across the project: shell scripts, README, CHANGELOG.
+
+Note: In CI, release-please handles versioning automatically.
+This script is a manual fallback for local use.
 
 Usage:
     python scripts/bump-version.py patch          # 0.2.0 -> 0.2.1
@@ -23,7 +26,7 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-VERSION_FILE = ROOT / "VERSION"
+VERSION_FILE = ROOT / "version.txt"
 
 TARGETS = [
     {
@@ -189,7 +192,7 @@ def main():
 
     # Update VERSION file
     VERSION_FILE.write_text(new_version + "\n", encoding="utf-8")
-    print("  done: VERSION")
+    print("  done: version.txt")
 
     # Update all target files
     for target in TARGETS:
