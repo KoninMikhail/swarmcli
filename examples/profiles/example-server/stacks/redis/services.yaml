@@ -1,0 +1,8 @@
+services:
+  redis:
+    type: registry
+    image: redis:7-alpine
+    meta:
+      group: databases
+      name: Redis
+      description: Cache and task queue

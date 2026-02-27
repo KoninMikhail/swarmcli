@@ -1,0 +1,19 @@
+# Multi-service monitoring stack: Prometheus + Grafana
+# Both services — registry (ready images from DockerHub)
+
+services:
+  prometheus:
+    type: registry
+    image: prom/prometheus:v3.2.1
+    meta:
+      group: monitoring
+      name: Prometheus
+      description: Metrics and alerting system
+
+  grafana:
+    type: registry
+    image: grafana/grafana:11.5.2
+    meta:
+      group: monitoring
+      name: Grafana
+      description: Metrics visualization and dashboards

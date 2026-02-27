@@ -1,0 +1,10 @@
+# SPA on nginx starts quickly
+services_ready_timeout: 15
+
+# Node.js build can be slow (npm install + vite build)
+build_timeout: 600
+
+# Per-stack Git auth override (uncomment if this stack needs different credentials)
+# git:
+#   http_user: ${GIT_HTTP_USER}
+#   http_token: ${GIT_HTTP_TOKEN}

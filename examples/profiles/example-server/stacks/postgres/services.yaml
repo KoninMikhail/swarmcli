@@ -1,0 +1,8 @@
+services:
+  postgres:
+    type: registry
+    image: postgres:16-alpine
+    meta:
+      group: databases
+      name: PostgreSQL
+      description: Primary relational database

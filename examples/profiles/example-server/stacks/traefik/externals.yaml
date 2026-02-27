@@ -1,0 +1,8 @@
+# No secrets required
+secrets: []
+
+# Docker Configs — simple strategy (default)
+# Config is created once; on subsequent deploys, existence is checked
+configs:
+  - name: traefik_config
+    file: configs/traefik.yml

@@ -1,0 +1,934 @@
+#!/usr/bin/env bash
+#===============================================================================
+# swarm-selfcheck - Self-diagnostic plugin for swarmcli
+#
+# Verifies that all modules are loaded correctly and core functions work.
+# This plugin performs non-invasive checks to ensure system health.
+#
+# Usage:
+#   swarmcli plugin selfcheck [command] [options]
+#   swarmcli selfcheck [command] [options]
+#
+# Commands:
+#   all         Run all checks (default)
+#   modules     Check module loading
+#   functions   Check core functions
+#   deps        Check external dependencies
+#   yaml        Test YAML parsing
+#   help        Show this help
+#
+# Options:
+#   --verbose   Show detailed output
+#   --json      Output in JSON format
+#   --quick     Run only critical checks
+#
+#===============================================================================
+set -euo pipefail
+
+# Plugin version
+VERSION="1.0.0"
+
+# Colors (if not already set)
+_COLOR=1
+[ -t 1 ] || _COLOR=0
+[ -n "${NO_COLOR:-}" ] && _COLOR=0
+
+_c() {
+  if [ "$_COLOR" = "1" ]; then
+    printf "\033[%sm%s\033[0m" "$1" "$2"
+  else
+    printf "%s" "$2"
+  fi
+}
+
+# Icons
+_icon() {
+  case "$1" in
+    ok)    printf "✓" ;;
+    fail)  printf "✗" ;;
+    warn)  printf "⚠" ;;
+    info)  printf "ℹ" ;;
+    skip)  printf "○" ;;
+    test)  printf "🧪" ;;
+    *)     printf "•" ;;
+  esac
+}
+
+# Logging
+_log() {
+  local level="$1"; shift
+  local msg="$*"
+  
+  if [ "${SWARM_FORCE_JSON:-}" = "1" ]; then
+    printf '{"level":"%s","msg":"%s"}\n' "$level" "$msg"
+    return
+  fi
+  
+  case "$level" in
+    ok)    printf "%s %s\n" "$(_c 32 "$(_icon ok)")" "$msg" ;;
+    fail)  printf "%s %s\n" "$(_c 31 "$(_icon fail)")" "$msg" ;;
+    warn)  printf "%s %s\n" "$(_c 33 "$(_icon warn)")" "$msg" ;;
+    info)  printf "%s %s\n" "$(_c 34 "$(_icon info)")" "$msg" ;;
+    skip)  printf "%s %s\n" "$(_c 90 "$(_icon skip)")" "$msg" ;;
+  esac
+}
+
+# Section header
+_section() {
+  if [ "${SWARM_FORCE_JSON:-}" != "1" ]; then
+    printf "\n%s %s\n" "$(_icon test)" "$(_c 1 "$1")"
+    printf "%s\n" "$(_c 90 "$(printf '%.0s─' {1..60})")"
+  fi
+}
+
+# Counters
+declare -g CHECKS_PASSED=0
+declare -g CHECKS_FAILED=0
+declare -g CHECKS_WARNED=0
+declare -g CHECKS_SKIPPED=0
+
+# JSON results array
+declare -g JSON_RESULTS="[]"
+
+_add_result() {
+  local category="$1"
+  local check="$2"
+  local status="$3"
+  local message="${4:-}"
+  
+  case "$status" in
+    ok)   CHECKS_PASSED=$((CHECKS_PASSED + 1)) ;;
+    fail) CHECKS_FAILED=$((CHECKS_FAILED + 1)) ;;
+    warn) CHECKS_WARNED=$((CHECKS_WARNED + 1)) ;;
+    skip) CHECKS_SKIPPED=$((CHECKS_SKIPPED + 1)) ;;
+  esac
+  
+  # Build JSON result
+  local json_item
+  json_item=$(printf '{"category":"%s","check":"%s","status":"%s","message":"%s"}' \
+    "$category" "$check" "$status" "$message")
+  
+  if [ "$JSON_RESULTS" = "[]" ]; then
+    JSON_RESULTS="[$json_item]"
+  else
+    JSON_RESULTS="${JSON_RESULTS%]},${json_item}]"
+  fi
+}
+
+# ============================================================================
+# Check functions
+# ============================================================================
+
+# Check if a function is defined
+_fn_exists() {
+  declare -f "$1" >/dev/null 2>&1
+}
+
+# Check if command exists
+_cmd_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Check module syntax (bash -n)
+check_module_syntax() {
+  local module="$1"
+  local name
+  name=$(basename "$module" .sh)
+  
+  if [ ! -f "$module" ]; then
+    _log fail "$name: file not found"
+    _add_result "modules" "$name" "fail" "file not found"
+    return 1
+  fi
+  
+  if bash -n "$module" 2>/dev/null; then
+    _log ok "$name: syntax OK"
+    _add_result "modules" "$name" "ok" "syntax valid"
+    return 0
+  else
+    _log fail "$name: syntax error"
+    _add_result "modules" "$name" "fail" "syntax error"
+    return 1
+  fi
+}
+
+# Check core.sh functions
+check_core_functions() {
+  local passed=0
+  local failed=0
+  
+  # List of expected functions from core.sh
+  local core_functions=(
+    "now_iso"
+    "c"
+    "icon"
+    "log"
+    "log_json"
+    "log_section"
+    "log_section_result"
+    "fail"
+    "with_spinner"
+    "ensure_cmd"
+    "run_with_timeout"
+    "safe_load_env"
+    "output_result"
+    "add_error"
+    "clear_errors"
+    "retry_with_backoff"
+  )
+  
+  for fn in "${core_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "core.sh: all $passed functions available"
+    _add_result "functions" "core.sh" "ok" "$passed functions"
+    return 0
+  else
+    _log fail "core.sh: $failed/$((passed+failed)) functions missing"
+    _add_result "functions" "core.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+}
+
+
+# Check YAML parsing functions
+check_yaml_functions() {
+  local passed=0
+  local failed=0
+  
+  local yaml_functions=(
+    "_yaml_get_indent"
+    "_yaml_strip_whitespace"
+    "_yaml_strip_quotes"
+    "_yaml_parse_kv"
+    "_yaml_preprocess_line"
+    "get_services_list"
+    "get_service_field"
+    "get_service_type"
+    "is_service_internal"
+    "get_service_branch"
+    "iter_build_args"
+    "get_required_secrets_list"
+    "validate_services_yaml"
+    "validate_service_branches"
+    "get_stack_setting"
+  )
+  
+  for fn in "${yaml_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "yaml.sh: all $passed functions available"
+    _add_result "functions" "yaml.sh" "ok" "$passed functions"
+    return 0
+  else
+    _log fail "yaml.sh: $failed functions missing"
+    _add_result "functions" "yaml.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+}
+
+# Check profiles functions
+check_profiles_functions() {
+  local passed=0
+  local failed=0
+  
+  local profiles_functions=(
+    "get_profiles_dir"
+    "get_profile_dir"
+    "get_profile_stacks_dir"
+    "get_stack_dir"
+    "profile_exists"
+    "list_profiles"
+    "get_profile_config"
+    "load_profile"
+    "get_current_stack_dir"
+    "stack_exists"
+    "ensure_stack_exists"
+    "list_profile_stacks"
+  )
+  
+  for fn in "${profiles_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "profiles.sh: all $passed functions available"
+    _add_result "functions" "profiles.sh" "ok" "$passed functions"
+    return 0
+  else
+    _log fail "profiles.sh: $failed functions missing"
+    _add_result "functions" "profiles.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+}
+
+# Check docker functions
+check_docker_functions() {
+  local passed=0
+  local failed=0
+  
+  local docker_functions=(
+    "image_tag_exists"
+    "build_for_service"
+    "force_update_services"
+    "get_stack_status"
+    "get_service_replicas_status"
+    "service_exists"
+    "get_service_errors"
+    "prune_images"
+    "smart_prune_stack_images"
+    "diagnose_service_failure"
+  )
+  
+  for fn in "${docker_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "docker.sh: all $passed functions available"
+    _add_result "functions" "docker.sh" "ok" "$passed functions"
+    return 0
+  else
+    _log fail "docker.sh: $failed functions missing"
+    _add_result "functions" "docker.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+}
+
+# Check secrets functions
+check_secrets_functions() {
+  local passed=0
+  local failed=0
+  
+  local secrets_functions=(
+    "secrets_manifest_iter"
+    "secret_exists"
+    "secrets_sync"
+    "secret_file_exists_and_not_empty"
+    "create_secret_from_file"
+    "check_required_secrets"
+    "list_secrets"
+    "cmd_secret_create"
+    "cmd_secret_rm"
+    "cmd_secret_generate"
+  )
+  
+  for fn in "${secrets_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "secrets.sh: all $passed functions available"
+    _add_result "functions" "secrets.sh" "ok" "$passed functions"
+    return 0
+  else
+    _log fail "secrets.sh: $failed functions missing"
+    _add_result "functions" "secrets.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+}
+
+# Check validation functions
+check_validation_functions() {
+  local passed=0
+  local failed=0
+  
+  local validation_functions=(
+    "detect_yaml_validator"
+    "validate_yaml_syntax"
+    "validate_docker_stack_yml"
+    "validate_stack_all"
+    "get_validator_info"
+    "cmd_validate"
+  )
+  
+  for fn in "${validation_functions[@]}"; do
+    if _fn_exists "$fn"; then
+      [ "${VERBOSE:-}" = "1" ] && _log ok "  $fn()"
+      passed=$((passed + 1))
+    else
+      _log fail "  $fn() not found"
+      failed=$((failed + 1))
+    fi
+  done
+  
+  if [ $failed -eq 0 ]; then
+    _log ok "validation.sh: all $passed functions available"
+    _add_result "functions" "validation.sh" "ok" "$passed functions"
+  else
+    _log fail "validation.sh: $failed functions missing"
+    _add_result "functions" "validation.sh" "fail" "$failed functions missing"
+    return 1
+  fi
+  
+  # Test YAML validator detection
+  if _fn_exists "detect_yaml_validator"; then
+    local validator
+    validator=$(detect_yaml_validator 2>/dev/null || echo "bash")
+    _log ok "YAML validator: $validator"
+    _add_result "validation" "yaml_validator" "ok" "$validator"
+  fi
+  
+  return 0
+}
+
+# Check dependencies (external commands)
+check_dependencies() {
+  local critical_deps=("bash" "docker" "git" "jq")
+  local optional_deps=("python3" "curl" "timeout")
+  
+  _section "Critical Dependencies"
+  
+  for dep in "${critical_deps[@]}"; do
+    if _cmd_exists "$dep"; then
+      local version=""
+      case "$dep" in
+        bash)   
+          version="$BASH_VERSION" 
+          ;;
+        docker) 
+          version=$(docker --version 2>/dev/null | head -1 | tr -d '\r\n' || echo "")
+          version="${version#Docker version }"
+          version="${version%%,*}"
+          [ -z "$version" ] && version="installed"
+          ;;
+        git)    
+          version=$(git --version 2>/dev/null | cut -d' ' -f3 | tr -d '\r\n' || echo "")
+          [ -z "$version" ] && version="installed"
+          ;;
+        jq)     
+          version=$(jq --version 2>/dev/null | tr -d '\r\n' || echo "installed")
+          [ -z "$version" ] && version="installed"
+          ;;
+      esac
+      _log ok "$dep: ${version:-available}"
+      _add_result "dependencies" "$dep" "ok" "${version:-available}"
+    else
+      _log fail "$dep: not found"
+      _add_result "dependencies" "$dep" "fail" "not installed"
+    fi
+  done
+  
+  _section "Optional Dependencies"
+  
+  for dep in "${optional_deps[@]}"; do
+    if _cmd_exists "$dep"; then
+      _log ok "$dep: available"
+      _add_result "dependencies" "$dep" "ok" "available"
+    else
+      _log skip "$dep: not installed (optional)"
+      _add_result "dependencies" "$dep" "skip" "not installed"
+    fi
+  done
+  
+  # Check Docker daemon
+  _section "Docker Status"
+  
+  if _cmd_exists "docker"; then
+    local docker_info
+    if docker_info=$(docker info 2>&1); then
+      _log ok "Docker daemon: running"
+      _add_result "docker" "daemon" "ok" "running"
+      
+      if echo "$docker_info" | grep -q "Swarm: active"; then
+        _log ok "Swarm mode: active"
+        _add_result "docker" "swarm" "ok" "active"
+      else
+        _log warn "Swarm mode: not initialized"
+        _add_result "docker" "swarm" "warn" "not initialized"
+      fi
+    else
+      _log fail "Docker daemon: not running or not accessible"
+      _add_result "docker" "daemon" "fail" "not running"
+    fi
+  else
+    _log skip "Docker: not installed"
+    _add_result "docker" "daemon" "skip" "not installed"
+  fi
+}
+
+# Check module loading
+check_all_modules() {
+  local lib_dir="${SWARM_PLATFORM_ROOT:-$PLATFORM_ROOT}/bin/lib"
+  
+  local modules=(
+    "core.sh"
+    "signals.sh"
+    "profiles.sh"
+    "yaml.sh"
+    "git.sh"
+    "docker.sh"
+    "locks.sh"
+    "deploy.sh"
+    "secrets.sh"
+    "generator.sh"
+    "plugins.sh"
+    "validation.sh"
+    "dependencies.sh"
+    "registry.sh"
+    "commands.sh"
+    "wizard.sh"
+    "args.sh"
+    "router.sh"
+  )
+  
+  _section "Module Syntax Check"
+  
+  local failed=0
+  for module in "${modules[@]}"; do
+    if ! check_module_syntax "$lib_dir/$module"; then
+      failed=$((failed + 1))
+    fi
+  done
+  
+  return $failed
+}
+
+# Load swarmcli modules for function checking
+# This is only needed when running plugin standalone (not through swarmcli)
+load_swarmcli_modules() {
+  local lib_dir="${SWARM_PLATFORM_ROOT:-$PLATFORM_ROOT}/bin/lib"
+  
+  # Check if already loaded (c function exists)
+  if _fn_exists "c"; then
+    _log ok "Modules already loaded (running via swarmcli)"
+    _add_result "loader" "modules" "ok" "already loaded"
+    return 0
+  fi
+  
+  _section "Loading Modules"
+  
+  # Define minimal globals needed for modules
+  export LOG_FORMAT="${LOG_FORMAT:-text}"
+  export QUIET="${QUIET:-0}"
+  export VERBOSE="${VERBOSE:-0}"
+  export DRY_RUN="${DRY_RUN:-0}"
+  export FORCE_JSON="${SWARM_FORCE_JSON:-0}"
+  export BIN_DIR="${SWARM_PLATFORM_ROOT:-$PLATFORM_ROOT}/bin"
+  export COLOR=1
+  [ -t 1 ] || export COLOR=0
+  [ -n "${NO_COLOR:-}" ] && export COLOR=0
+  
+  # Load modules in order
+  local modules_to_load=(
+    "core.sh"
+    "signals.sh"
+    "profiles.sh"
+    "yaml.sh"
+    "git.sh"
+    "docker.sh"
+    "locks.sh"
+    "deploy.sh"
+    "secrets.sh"
+    "generator.sh"
+    "plugins.sh"
+    "validation.sh"
+    "dependencies.sh"
+    "registry.sh"
+  )
+  
+  local loaded=0
+  local failed_modules=()
+  
+  for module in "${modules_to_load[@]}"; do
+    local module_path="$lib_dir/$module"
+    if [ -f "$module_path" ]; then
+      # shellcheck disable=SC1090
+      if . "$module_path" 2>/dev/null; then
+        loaded=$((loaded + 1))
+        [ "${VERBOSE:-}" = "1" ] && _log ok "  Loaded: $module"
+      else
+        failed_modules+=("$module")
+        [ "${VERBOSE:-}" = "1" ] && _log fail "  Failed: $module"
+      fi
+    else
+      failed_modules+=("$module")
+    fi
+  done
+  
+  
+  if [ ${#failed_modules[@]} -eq 0 ]; then
+    _log ok "Loaded $loaded modules successfully"
+    _add_result "loader" "modules" "ok" "$loaded modules loaded"
+    return 0
+  else
+    _log warn "Loaded $loaded modules, ${#failed_modules[@]} failed: ${failed_modules[*]}"
+    _add_result "loader" "modules" "warn" "${#failed_modules[@]} failed"
+    return 1
+  fi
+}
+
+# Check all function groups
+check_all_functions() {
+  # First, try to load modules
+  load_swarmcli_modules
+  
+  _section "Core Functions (core.sh)"
+  check_core_functions
+  
+  _section "YAML Functions (yaml.sh)"
+  check_yaml_functions
+  
+  _section "Profiles Functions (profiles.sh)"
+  check_profiles_functions
+  
+  _section "Docker Functions (docker.sh)"
+  check_docker_functions
+  
+  _section "Secrets Functions (secrets.sh)"
+  check_secrets_functions
+  
+  _section "Validation Functions (validation.sh)"
+  check_validation_functions
+}
+
+# Test YAML parsing with sample data
+test_yaml_parsing() {
+  _section "YAML Parsing Test"
+  
+  # Create temp test file
+  local tmpfile
+  tmpfile=$(mktemp)
+  
+  cat > "$tmpfile" << 'EOF'
+services:
+  api:
+    type: git
+    image: myregistry/api
+    repo: git@github.com:org/api.git
+    default_branch: main
+    build:
+      context: .
+      dockerfile: Dockerfile
+  worker:
+    type: registry
+    image: redis:7-alpine
+EOF
+  
+  # Test parsing
+  if _fn_exists "_yaml_get_indent"; then
+    local test_line="    key: value"
+    _yaml_get_indent "$test_line"
+    if [ "$REPLY" = "4" ]; then
+      _log ok "_yaml_get_indent: correct (4 spaces)"
+      _add_result "yaml_test" "get_indent" "ok" "correct"
+    else
+      _log fail "_yaml_get_indent: expected 4, got $REPLY"
+      _add_result "yaml_test" "get_indent" "fail" "wrong value"
+    fi
+  fi
+  
+  if _fn_exists "_yaml_parse_kv"; then
+    _yaml_parse_kv "key: value with spaces"
+    if [ "$REPLY_KEY" = "key" ] && [ "$REPLY_VAL" = "value with spaces" ]; then
+      _log ok "_yaml_parse_kv: correct parsing"
+      _add_result "yaml_test" "parse_kv" "ok" "correct"
+    else
+      _log fail "_yaml_parse_kv: incorrect parsing"
+      _add_result "yaml_test" "parse_kv" "fail" "wrong values"
+    fi
+  fi
+  
+  if _fn_exists "_yaml_strip_quotes"; then
+    _yaml_strip_quotes '"quoted value"'
+    if [ "$REPLY" = "quoted value" ]; then
+      _log ok "_yaml_strip_quotes: correct"
+      _add_result "yaml_test" "strip_quotes" "ok" "correct"
+    else
+      _log fail "_yaml_strip_quotes: incorrect"
+      _add_result "yaml_test" "strip_quotes" "fail" "wrong value"
+    fi
+  fi
+  
+  rm -f "$tmpfile"
+}
+
+
+# Check environment
+check_environment() {
+  _section "Environment"
+  
+  # Check platform root
+  local platform_root="${SWARM_PLATFORM_ROOT:-${PLATFORM_ROOT:-}}"
+  if [ -n "$platform_root" ] && [ -d "$platform_root" ]; then
+    _log ok "PLATFORM_ROOT: $platform_root"
+    _add_result "environment" "PLATFORM_ROOT" "ok" "$platform_root"
+  else
+    _log warn "PLATFORM_ROOT: not set or invalid"
+    _add_result "environment" "PLATFORM_ROOT" "warn" "not set"
+  fi
+  
+  # Check profile
+  local profile="${SWARM_PROFILE:-${ACTIVE_PROFILE:-}}"
+  if [ -n "$profile" ]; then
+    _log ok "Profile: $profile"
+    _add_result "environment" "profile" "ok" "$profile"
+  else
+    _log info "Profile: not set (OK for selfcheck)"
+    _add_result "environment" "profile" "skip" "not required"
+  fi
+  
+  # Check key environment variables
+  local env_vars=(
+    "DEFAULT_BRANCH"
+    "TIMEOUT_SECONDS"
+    "SERVICES_READY_TIMEOUT"
+  )
+  
+  for var in "${env_vars[@]}"; do
+    local val="${!var:-}"
+    if [ -n "$val" ]; then
+      _log ok "$var: $val"
+      _add_result "environment" "$var" "ok" "$val"
+    else
+      _log skip "$var: not set (using defaults)"
+      _add_result "environment" "$var" "skip" "default"
+    fi
+  done
+}
+
+# Print summary
+print_summary() {
+  if [ "${SWARM_FORCE_JSON:-}" = "1" ]; then
+    printf '{"passed":%d,"failed":%d,"warned":%d,"skipped":%d,"results":%s}\n' \
+      "$CHECKS_PASSED" "$CHECKS_FAILED" "$CHECKS_WARNED" "$CHECKS_SKIPPED" "$JSON_RESULTS"
+    return
+  fi
+  
+  echo ""
+  echo "═══════════════════════════════════════════════════════════════"
+  printf " %s Self-Check Summary\n" "$(_icon test)"
+  echo "═══════════════════════════════════════════════════════════════"
+  echo ""
+  printf "  %s Passed:  %d\n" "$(_c 32 "$(_icon ok)")" "$CHECKS_PASSED"
+  printf "  %s Failed:  %d\n" "$(_c 31 "$(_icon fail)")" "$CHECKS_FAILED"
+  printf "  %s Warnings: %d\n" "$(_c 33 "$(_icon warn)")" "$CHECKS_WARNED"
+  printf "  %s Skipped: %d\n" "$(_c 90 "$(_icon skip)")" "$CHECKS_SKIPPED"
+  echo ""
+  
+  if [ "$CHECKS_FAILED" -eq 0 ]; then
+    printf "  %s %s\n" "$(_c 32 "$(_icon ok)")" "$(_c 32 "All critical checks passed!")"
+  else
+    printf "  %s %s\n" "$(_c 31 "$(_icon fail)")" "$(_c 31 "Some checks failed. Review output above.")"
+  fi
+  echo ""
+}
+
+# ============================================================================
+# Commands
+# ============================================================================
+
+show_help() {
+  cat << EOF
+swarm-selfcheck v${VERSION}
+
+Self-diagnostic plugin for swarmcli. Verifies that all modules
+are loaded correctly and core functions work as expected.
+
+Usage:
+  swarmcli plugin selfcheck [command] [options]
+  swarmcli selfcheck [command] [options]
+
+Commands:
+  all         Run all checks (default)
+  modules     Check module syntax only
+  functions   Check core functions only
+  deps        Check external dependencies only
+  yaml        Test YAML parsing
+  env         Check environment
+  quick       Run only critical checks
+  help        Show this help
+
+Options:
+  --verbose   Show detailed output for each function
+  --json      Output in JSON format
+  --help, -h  Show this help
+
+Examples:
+  swarmcli selfcheck              # Run all checks
+  swarmcli selfcheck --verbose    # Detailed output
+  swarmcli selfcheck modules      # Check module syntax only
+  swarmcli selfcheck deps         # Check dependencies only
+  swarmcli selfcheck --json       # JSON output for automation
+
+Exit Codes:
+  0   All checks passed
+  1   Some checks failed
+EOF
+}
+
+cmd_all() {
+  check_environment
+  check_dependencies
+  check_all_modules
+  check_all_functions
+  test_yaml_parsing
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+cmd_modules() {
+  check_all_modules
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+cmd_functions() {
+  check_all_functions
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+cmd_deps() {
+  check_dependencies
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+cmd_yaml() {
+  test_yaml_parsing
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+
+cmd_env() {
+  check_environment
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+cmd_quick() {
+  _section "Quick Self-Check"
+  
+  # Only critical checks
+  check_dependencies
+  
+  _section "Critical Modules"
+  local lib_dir="${SWARM_PLATFORM_ROOT:-$PLATFORM_ROOT}/bin/lib"
+  local critical_modules=("core.sh" "profiles.sh" "yaml.sh" "docker.sh" "deploy.sh")
+  
+  for module in "${critical_modules[@]}"; do
+    check_module_syntax "$lib_dir/$module"
+  done
+  
+  print_summary
+  
+  [ "$CHECKS_FAILED" -eq 0 ]
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+
+main() {
+  local cmd="${1:-all}"
+  shift || true
+  
+  # Parse options
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --verbose)
+        export VERBOSE=1
+        ;;
+      --json)
+        export SWARM_FORCE_JSON=1
+        _COLOR=0
+        ;;
+      --help|-h)
+        show_help
+        return 0
+        ;;
+      *)
+        if [ -z "${cmd:-}" ] || [ "$cmd" = "all" ]; then
+          cmd="$1"
+        fi
+        ;;
+    esac
+    shift
+  done
+  
+  # Header
+  if [ "${SWARM_FORCE_JSON:-}" != "1" ]; then
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║  $(_icon test) swarm-selfcheck v${VERSION}                                  ║"
+    echo "║  Self-diagnostic for swarmcli modules                         ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+  fi
+  
+  case "$cmd" in
+    --help|-h|help)
+      show_help
+      ;;
+    all)
+      cmd_all
+      ;;
+    modules)
+      cmd_modules
+      ;;
+    functions)
+      cmd_functions
+      ;;
+    deps)
+      cmd_deps
+      ;;
+    yaml)
+      cmd_yaml
+      ;;
+    env)
+      cmd_env
+      ;;
+    quick)
+      cmd_quick
+      ;;
+    *)
+      echo "Unknown command: $cmd" >&2
+      echo "Run 'swarmcli selfcheck --help' for usage." >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
+

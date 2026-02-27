@@ -1,0 +1,40 @@
+# =============================================================================
+# App Frontend — SPA (static docker-stack.yml)
+# =============================================================================
+# Demonstrates:
+#   - git service (built from repository)
+#   - Static docker-stack.yml (no Jinja2)
+#   - Build args for SPA (API URL embedded at build time)
+#   - Traefik labels for routing
+#   - TAG_* variable for image versioning
+# =============================================================================
+
+networks:
+  example_network:
+    external: true
+
+services:
+  frontend:
+    image: local/app-frontend:${TAG_FRONTEND}
+    environment:
+      TZ: ${GLOBAL_TZ}
+    networks:
+      example_network:
+        aliases:
+          - app-frontend
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.app-frontend.rule=Host(`example.localhost`)
+        - traefik.http.routers.app-frontend.entrypoints=web
+        - traefik.http.services.app-frontend.loadbalancer.server.port=80
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"

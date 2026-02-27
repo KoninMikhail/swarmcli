@@ -1,0 +1,85 @@
+# GitHub Actions — Deploy with SwarmCLI
+#
+# Prerequisites:
+#   1. SwarmCLI installed on the target server
+#   2. SSH access configured (see secrets below)
+#   3. Profile configured on the server
+#
+# Required secrets:
+#   DEPLOY_HOST     — server hostname or IP
+#   DEPLOY_USER     — SSH username
+#   DEPLOY_SSH_KEY  — private SSH key for authentication
+#
+# Optional secrets:
+#   DEPLOY_PORT     — SSH port (default: 22)
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: 'Stack to deploy (empty = all changed)'
+        required: false
+      profile:
+        description: 'Server profile'
+        required: true
+        default: 'server-dev'
+
+env:
+  SWARMCLI_PATH: /opt/swarmcli
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.profile || 'server-dev' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.profile || 'server-dev' }}
+    concurrency:
+      group: deploy-${{ github.event.inputs.profile || 'server-dev' }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script_stop: true
+          script: |
+            cd ${{ env.SWARMCLI_PATH }}
+
+            # Update swarmcli
+            ${{ env.SWARMCLI_PATH }}/bin/swarm.sh system update
+
+            # Set profile
+            PROFILE="${{ github.event.inputs.profile || 'server-dev' }}"
+            STACK="${{ github.event.inputs.stack }}"
+
+            if [ -n "$STACK" ]; then
+              # Deploy specific stack
+              ${{ env.SWARMCLI_PATH }}/bin/swarm.sh --profile "$PROFILE" deploy "$STACK"
+            else
+              # Sync, build, and deploy all changed stacks
+              ${{ env.SWARMCLI_PATH }}/bin/swarm.sh --profile "$PROFILE" sync
+              ${{ env.SWARMCLI_PATH }}/bin/swarm.sh --profile "$PROFILE" build
+              ${{ env.SWARMCLI_PATH }}/bin/swarm.sh --profile "$PROFILE" deploy
+            fi
+
+      - name: Verify deployment
+        if: success()
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            PROFILE="${{ github.event.inputs.profile || 'server-dev' }}"
+            ${{ env.SWARMCLI_PATH }}/bin/swarm.sh --profile "$PROFILE" ps

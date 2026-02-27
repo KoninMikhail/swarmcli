@@ -1,0 +1,6 @@
+# Secrets that must exist in Docker Swarm before deploy.
+# Secret files are stored in .secrets/ at swarmcli root (NOT in git).
+secrets:
+  - app_db_user
+  - app_db_password
+  - app_jwt_secret

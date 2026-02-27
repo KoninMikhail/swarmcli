@@ -1,0 +1,13 @@
+# Default owners for the entire repository
+* @KoninMikhail
+
+# Shell scripts
+bin/ @KoninMikhail
+install.sh @KoninMikhail
+uninstall.sh @KoninMikhail
+
+# Documentation
+docs/ @KoninMikhail
+
+# CI/CD
+.github/ @KoninMikhail

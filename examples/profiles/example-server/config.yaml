@@ -1,0 +1,37 @@
+# Profile: example-server
+# Demonstration profile for exploring SwarmCLI capabilities
+#
+# Not a production profile — Git repository URLs are placeholders.
+# Use as a template for creating your own profile.
+
+name: example-server
+description: Example server — SwarmCLI capabilities demonstration
+
+# Docker Swarm
+swarm:
+  # Timeout for waiting for services to be ready after deploy (seconds)
+  services_ready_timeout: 30
+
+  # How many image versions to keep locally
+  # 3 = current + previous + spare for rollback
+  keep_images_count: 3
+
+# Git
+git:
+  # Default branch for all git services in the profile
+  default_branch: main
+
+  # Auth for HTTPS cloning (sync/build). Priority: stack settings > profile > .swarmcli.yaml/env
+  # Uncomment to override for this profile:
+  #
+  # http_user: ${GIT_HTTP_USER}   # Deploy Token: set both
+  # http_token: ${GIT_HTTP_TOKEN}
+  #
+  # Per-stack override: add git.http_user / git.http_token to stack's settings.yaml
+
+# Retry logic for network operations (git clone, docker pull, etc.)
+retry:
+  enabled: true
+  max_attempts: 3
+  initial_delay: 2
+  max_delay: 30

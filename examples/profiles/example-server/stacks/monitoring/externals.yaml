@@ -1,0 +1,11 @@
+secrets:
+  - grafana_admin_password
+
+# Docker Configs — versioned strategy (from settings.yaml)
+# New config version created on each deploy.
+# In template use {{ config_name('...') }} to get current name.
+configs:
+  - name: prometheus_config
+    file: configs/prometheus.yml
+  - name: grafana_datasources
+    file: configs/grafana-datasources.yml

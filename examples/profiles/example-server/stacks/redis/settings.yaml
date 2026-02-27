@@ -1,0 +1,2 @@
+# Redis starts instantly
+services_ready_timeout: 15

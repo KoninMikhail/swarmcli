@@ -1,0 +1,3 @@
+secrets:
+  - app_db_user
+  - app_db_password

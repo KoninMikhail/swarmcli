@@ -1,0 +1,7 @@
+# Build variables only: passed as --build-arg during docker build
+# SPA does not need deploy variables — everything is embedded at build time
+
+build:
+  NODE_ENV: production
+  VITE_API_URL: https://api.example.localhost/api
+  VITE_APP_TITLE: Example App

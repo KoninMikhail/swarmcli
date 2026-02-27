@@ -1,0 +1,8 @@
+services:
+  traefik:
+    type: registry
+    image: traefik:v3.2
+    meta:
+      group: infrastructure
+      name: Traefik
+      description: Reverse proxy and load balancer

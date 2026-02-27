@@ -1,0 +1,125 @@
+# =============================================================================
+# JINJA2 TEMPLATE — Monitoring (Prometheus + Grafana)
+# =============================================================================
+# DO NOT edit .build/docker-stack.yml directly!
+# Make changes in this file or in configs/
+#
+# Render: swarmcli template render monitoring
+# Preview variables: swarmcli template vars monitoring
+# =============================================================================
+#
+# Demonstrates:
+#   - Multi-service registry stack (both services from DockerHub)
+#   - Docker Configs with versioned strategy (config_name() helper)
+#   - Multiple volumes
+#   - Secrets via entrypoint
+#   - Traefik labels for Grafana
+# =============================================================================
+
+x-global-env: &global-env
+  TZ: {{ GLOBAL_TZ }}
+
+{% if RUNTIME_VARS %}
+x-runtime-env: &runtime-env
+{%- for key, value in RUNTIME_VARS.items() %}
+  {{ key }}: "{{ value }}"
+{%- endfor %}
+{% else %}
+x-runtime-env: &runtime-env {}
+{% endif %}
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  example_network:
+    external: true
+
+secrets:
+  grafana_admin_password:
+    external: true
+
+# config_name() returns current config name for versioned strategy
+# Format: <name>_<profile>_<commit_sha>
+configs:
+  {{ config_name('prometheus_config') }}:
+    external: true
+  {{ config_name('grafana_datasources') }}:
+    external: true
+
+services:
+
+  # ── Prometheus ─────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    environment:
+      <<: [*global-env, *runtime-env]
+    configs:
+      - source: {{ config_name('prometheus_config') }}
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      example_network:
+        aliases:
+          - {{ SERVICE_MONITORING_PROMETHEUS_HOST }}
+    labels:
+{{ dozzle_labels('prometheus') }}
+    deploy:
+{{ deploy_resources('prometheus', stack='monitoring') }}
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  # ── Grafana ────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:11.5.2
+    environment:
+      <<: [*global-env, *runtime-env]
+      GF_SECURITY_ADMIN_USER: admin
+    entrypoint: |
+      /bin/sh -c "
+        export GF_SECURITY_ADMIN_PASSWORD=$$(cat /run/secrets/grafana_password)
+        exec /run.sh
+      "
+    configs:
+      - source: {{ config_name('grafana_datasources') }}
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+    secrets:
+      - source: grafana_admin_password
+        target: grafana_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      example_network:
+        aliases:
+          - {{ SERVICE_MONITORING_GRAFANA_HOST }}
+    labels:
+{{ dozzle_labels('grafana') }}
+    deploy:
+{{ deploy_resources('grafana', stack='monitoring') }}
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.grafana.rule=Host(`{{ SERVICE_MONITORING_GRAFANA_PUBLIC_HOST }}`)
+        - traefik.http.routers.grafana.entrypoints=web
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

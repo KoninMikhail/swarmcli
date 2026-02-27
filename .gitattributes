@@ -1,0 +1,33 @@
+# Default behavior
+* text=auto
+
+# Shell scripts always LF
+*.sh text eol=lf
+bin/swarm.sh text eol=lf
+plugins/swarm-* text eol=lf
+install.sh text eol=lf
+uninstall.sh text eol=lf
+
+# Batch files always CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# YAML files
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Jinja2 templates
+*.j2 text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+# Python
+*.py text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+

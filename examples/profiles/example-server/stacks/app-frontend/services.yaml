@@ -1,0 +1,15 @@
+services:
+  frontend:
+    type: git
+    repo: https://github.com/example-org/app-frontend.git
+    default_branch: main
+    build:
+      context: .
+      dockerfile: Dockerfile
+      build_args:
+        NODE_ENV: production
+    image: local/app-frontend
+    meta:
+      group: core
+      name: Frontend
+      description: SPA frontend (React/Vue/Angular)

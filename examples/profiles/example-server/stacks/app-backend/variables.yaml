@@ -1,0 +1,25 @@
+# =============================================================================
+# App Backend stack variables
+# =============================================================================
+#
+# runtime.env.* — auto-injection into container environment via {{ inject_env_vars() }}
+# build.*       — passed as --build-arg during docker build
+# =============================================================================
+
+build:
+  APP_ENV: production
+
+runtime:
+  env:
+    # Service URLs (from endpoints.yaml)
+    DATABASE_URL: postgres://${SERVICE_DATABASES_POSTGRESQL_HOST}:${SERVICE_DATABASES_POSTGRESQL_PORT}/${SERVICE_DATABASES_POSTGRESQL_DATABASE}
+    REDIS_URL: redis://${SERVICE_DATABASES_REDIS_HOST}:${SERVICE_DATABASES_REDIS_PORT}
+
+    # Application settings
+    APP_PORT: "8080"
+    APP_WORKERS: "4"
+    CORS_ORIGINS: https://example.localhost,http://localhost:3000
+
+    # External services
+    PROMETHEUS_METRICS_ENABLED: "true"
+    PROMETHEUS_METRICS_PATH: /metrics

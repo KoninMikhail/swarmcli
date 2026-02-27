@@ -1,0 +1,21 @@
+# =============================================================================
+# Global variables for example-server profile
+# =============================================================================
+#
+# Available in ALL profile stacks with GLOBAL_ prefix
+# Example: TZ → GLOBAL_TZ in docker-stack.yml / Jinja2 templates
+#
+# Priority: CI variables > stack variables.yaml > globals.yaml
+# =============================================================================
+
+# Timezone for all services
+TZ: Europe/Moscow
+
+# Environment (for conditional logic in applications)
+PLATFORM_ENV: example
+
+# Default log level
+LOG_LEVEL: INFO
+
+# Base domain (used in endpoints and traefik labels)
+DOMAIN: example.localhost

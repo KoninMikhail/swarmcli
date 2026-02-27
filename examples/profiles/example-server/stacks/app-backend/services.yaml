@@ -1,0 +1,35 @@
+# Multi-service stack: API + Worker + Scheduler
+#
+# Demonstrates:
+#   - type: git — build from Git repository
+#   - type: none — derived services (same image, different CMD)
+
+services:
+  api:
+    type: git
+    repo: https://github.com/example-org/app-backend.git
+    default_branch: develop
+    build:
+      context: .
+      dockerfile: Dockerfile
+      build_args:
+        APP_ENV: production
+    image: local/app-backend
+    meta:
+      group: core
+      name: Backend API
+      description: REST API service
+
+  worker:
+    type: none
+    meta:
+      group: core
+      name: Backend Worker
+      description: Background task processing (same image, different CMD)
+
+  scheduler:
+    type: none
+    meta:
+      group: core
+      name: Backend Scheduler
+      description: Task scheduler (same image, different CMD)

@@ -1,0 +1,60 @@
+# =============================================================================
+# Traefik — Reverse Proxy (static docker-stack.yml)
+# =============================================================================
+# Demonstrates:
+#   - registry service (image from DockerHub)
+#   - Docker Configs (simple strategy) via externals.yaml
+#   - Placement constraints
+#   - Healthcheck
+#   - External network
+# =============================================================================
+
+networks:
+  example_network:
+    external: true
+
+configs:
+  traefik_config:
+    external: true
+
+services:
+  traefik:
+    image: traefik:v3.2
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+    environment:
+      TZ: ${GLOBAL_TZ}
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/traefik.yml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - example_network
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.dashboard.rule=Host(`traefik.example.localhost`)
+        - traefik.http.routers.dashboard.entrypoints=web
+        - traefik.http.routers.dashboard.service=api@internal
+        - traefik.http.services.dashboard.loadbalancer.server.port=8080
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

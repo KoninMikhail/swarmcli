@@ -1,0 +1,12 @@
+# Grafana datasource provisioning
+# This file is created as Docker config (versioned strategy)
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false

@@ -1,0 +1,22 @@
+# SwarmCLI instance configuration — example only, do not copy
+# Use: install.sh (creates .swarmcli.yaml) or: swarmcli config init
+
+config_version: 1
+
+state:
+  default_profile: null
+
+paths:
+  secrets: .secrets
+  locks: .locks
+
+operations:
+  log_format: text
+  timeout: 900
+  lock_timeout: 3600
+
+git:
+  auth:
+    # http_user: "your-deploy-token"
+    # http_token: "your-deploy-token-here"
+    # http_password: null

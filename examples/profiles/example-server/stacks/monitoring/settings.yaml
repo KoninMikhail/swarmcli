@@ -1,0 +1,11 @@
+services_ready_timeout: 45
+
+# One-shot init services (run once and exit) — exclude from readiness check
+# List service names from docker-stack.yml / services.yaml
+# readiness_exclude:
+#   - init
+
+# Versioned strategy — new config on each deploy
+# Config name: <name>_<profile>_<commit_sha>
+# Allows rollback to previous config version
+config_strategy: versioned

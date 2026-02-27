@@ -1,0 +1,61 @@
+# =============================================================================
+# PostgreSQL — Database (static docker-stack.yml)
+# =============================================================================
+# Demonstrates:
+#   - registry service
+#   - Secrets (DB password from externals.yaml)
+#   - Volumes (persistent data)
+#   - Healthcheck
+#   - Reading secrets via entrypoint
+# =============================================================================
+
+volumes:
+  pgdata:
+
+networks:
+  example_network:
+    external: true
+
+secrets:
+  app_db_user:
+    external: true
+  app_db_password:
+    external: true
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      TZ: ${GLOBAL_TZ}
+      POSTGRES_DB: example_db
+      POSTGRES_USER_FILE: /run/secrets/db_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - source: app_db_user
+        target: db_username
+      - source: app_db_password
+        target: db_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      example_network:
+        aliases:
+          - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_username) -d example_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

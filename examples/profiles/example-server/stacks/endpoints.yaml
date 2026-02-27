@@ -1,0 +1,66 @@
+# =============================================================================
+# Endpoints — service addresses for inter-service communication
+# =============================================================================
+#
+# CLI generates variables:
+#   ${SERVICE_<CATEGORY>_<NAME>_HOST}        — hostname (internal)
+#   ${SERVICE_<CATEGORY>_<NAME>_PORT}        — port
+#   ${SERVICE_<CATEGORY>_<NAME>_URL}         — http://host:port
+#   ${SERVICE_<CATEGORY>_<NAME>_PUBLIC_HOST} — public domain (optional)
+#   ${SERVICE_<CATEGORY>_<NAME>_NETWORK}     — Docker network (optional)
+#   ${SERVICE_<CATEGORY>_<NAME>_DATABASE}    — database name (optional)
+#
+# Usage in variables.yaml:
+#   BACKEND_URL: ${SERVICE_CORE_BACKEND_API_URL}
+#
+# =============================================================================
+
+endpoints:
+
+  # === Application core services ===
+  core:
+    backend_api:
+      host: app-backend-api
+      port: 8080
+      public_host: api.example.localhost
+      network: example_network
+
+    frontend:
+      host: app-frontend
+      port: 80
+      public_host: example.localhost
+      network: example_network
+
+  # === Databases and storage ===
+  databases:
+    postgresql:
+      host: postgres
+      port: 5432
+      database: example_db
+      network: example_network
+
+    redis:
+      host: redis
+      port: 6379
+      network: example_network
+
+  # === Infrastructure ===
+  infrastructure:
+    traefik:
+      host: traefik
+      port: 8080
+      public_host: traefik.example.localhost
+      network: example_network
+
+  # === Monitoring ===
+  monitoring:
+    prometheus:
+      host: prometheus
+      port: 9090
+      network: example_network
+
+    grafana:
+      host: grafana
+      port: 3000
+      public_host: grafana.example.localhost
+      network: example_network

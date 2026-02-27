@@ -1,0 +1,99 @@
+# =============================================================================
+# Centralized CPU/Memory resource management
+# =============================================================================
+#
+# Resources are injected into docker-stack.yml via Jinja2 templates
+# (deploy_resources function) or applied by CLI during deploy.
+#
+# Services without an entry here deploy without resource limits.
+#
+# Format:
+#   stacks:
+#     <stack-name>:
+#       <service-name>:
+#         limits:           — maximum resources
+#         reservations:     — guaranteed minimum
+# =============================================================================
+
+stacks:
+
+  # === Reverse Proxy ===
+  traefik:
+    traefik:
+      limits:
+        cpus: "1.0"
+        memory: "512M"
+      reservations:
+        cpus: "0.1"
+        memory: "128M"
+
+  # === Backend API + Workers ===
+  app-backend:
+    api:
+      limits:
+        cpus: "2.0"
+        memory: "2G"
+      reservations:
+        cpus: "0.25"
+        memory: "256M"
+    worker:
+      limits:
+        cpus: "1.0"
+        memory: "1G"
+      reservations:
+        cpus: "0.1"
+        memory: "128M"
+    scheduler:
+      limits:
+        cpus: "0.5"
+        memory: "512M"
+      reservations:
+        cpus: "0.1"
+        memory: "64M"
+
+  # === Frontend ===
+  app-frontend:
+    frontend:
+      limits:
+        cpus: "0.5"
+        memory: "256M"
+      reservations:
+        cpus: "0.1"
+        memory: "64M"
+
+  # === Database ===
+  postgres:
+    postgres:
+      limits:
+        cpus: "2.0"
+        memory: "4G"
+      reservations:
+        cpus: "0.5"
+        memory: "1G"
+
+  # === Cache ===
+  redis:
+    redis:
+      limits:
+        cpus: "0.5"
+        memory: "512M"
+      reservations:
+        cpus: "0.1"
+        memory: "64M"
+
+  # === Monitoring ===
+  monitoring:
+    prometheus:
+      limits:
+        cpus: "1.0"
+        memory: "2G"
+      reservations:
+        cpus: "0.25"
+        memory: "512M"
+    grafana:
+      limits:
+        cpus: "0.5"
+        memory: "512M"
+      reservations:
+        cpus: "0.1"
+        memory: "128M"

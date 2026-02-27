@@ -1,0 +1,47 @@
+# =============================================================================
+# Redis — Cache / Queue (static docker-stack.yml)
+# =============================================================================
+# Demonstrates:
+#   - Simplest stack — minimal set of files
+#   - registry service without secrets and configs
+#   - Healthcheck
+#   - Volume for persistence
+# =============================================================================
+
+volumes:
+  redis_data:
+
+networks:
+  example_network:
+    external: true
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: ${GLOBAL_TZ}
+    volumes:
+      - redis_data:/data
+    networks:
+      example_network:
+        aliases:
+          - redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"

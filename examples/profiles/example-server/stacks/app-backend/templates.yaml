@@ -1,0 +1,23 @@
+# Jinja2 templating configuration
+# Documentation: docs/02-guides/templates/
+
+engine: jinja2
+
+templates:
+  docker-stack:
+    source: templates/docker-stack.j2
+    output: .build/docker-stack.yml
+
+# Variable sources (order = priority, last wins)
+variable_sources:
+  - globals        # GLOBAL_* from globals.yaml
+  - endpoints      # SERVICE_* from endpoints.yaml
+  - variables      # from variables.yaml (runtime.env → ENV_VARS)
+  - environment    # DEPLOY_*, BUILD_*, COMMON_*, TAG_*
+
+# Rendering will fail if these variables are missing
+required_vars:
+  - GLOBAL_TZ
+  - TAG_API
+  - SERVICE_DATABASES_POSTGRESQL_HOST
+  - SERVICE_DATABASES_REDIS_HOST

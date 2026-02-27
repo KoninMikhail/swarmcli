@@ -1,0 +1,150 @@
+# =============================================================================
+# JINJA2 TEMPLATE — App Backend (API + Worker + Scheduler)
+# =============================================================================
+# DO NOT edit .build/docker-stack.yml directly!
+# Make changes in this file or in variables.yaml
+#
+# Render: swarmcli template render app-backend
+# Preview variables: swarmcli template vars app-backend
+# =============================================================================
+#
+# Demonstrates:
+#   - Jinja2 helper functions: service_image(), deploy_resources(), dozzle_labels()
+#   - Auto-injection of variables from runtime.env (ENV_VARS)
+#   - YAML anchors for block reuse
+#   - type: none — worker and scheduler use the same image as api
+#   - Secrets via externals.yaml
+#   - Inter-service communication via endpoints
+# =============================================================================
+
+# Global variables (from globals.yaml)
+x-global-env: &global-env
+  TZ: {{ GLOBAL_TZ }}
+  LOG_LEVEL: {{ LOG_LEVEL | default(GLOBAL_LOG_LEVEL) }}
+
+# Variables from variables.yaml → runtime.env (auto-injection)
+{% if ENV_VARS %}
+x-env-vars: &env-vars
+{%- for key, value in ENV_VARS.items() | sort %}
+  {{ key }}: "{{ value }}"
+{%- endfor %}
+{% else %}
+x-env-vars: &env-vars {}
+{% endif %}
+
+# Variables from CI (RUNTIME_* → highest priority)
+{% if RUNTIME_VARS %}
+x-runtime-env: &runtime-env
+{%- for key, value in RUNTIME_VARS.items() %}
+  {{ key }}: "{{ value }}"
+{%- endfor %}
+{% else %}
+x-runtime-env: &runtime-env {}
+{% endif %}
+
+networks:
+  example_network:
+    external: true
+
+secrets:
+  app_db_user:
+    external: true
+  app_db_password:
+    external: true
+  app_jwt_secret:
+    external: true
+
+services:
+
+  # ── API service (type: git — built from repository) ───────────────────────
+  api:
+    image: {{ service_image('api') }}
+    environment:
+      <<: [*global-env, *env-vars, *runtime-env]
+    labels:
+{{ dozzle_labels('api') }}
+    networks:
+      example_network:
+        aliases:
+          - {{ SERVICE_CORE_BACKEND_API_HOST }}
+    secrets:
+      - source: app_db_user
+        target: db_username
+      - source: app_db_password
+        target: db_password
+      - source: app_jwt_secret
+        target: jwt_secret
+    deploy:
+{{ deploy_resources('api', stack='app-backend') }}
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.app-backend-api.rule=Host(`{{ SERVICE_CORE_BACKEND_API_PUBLIC_HOST }}`) && PathPrefix(`/api/`)
+        - traefik.http.routers.app-backend-api.entrypoints=web
+        - traefik.http.services.app-backend-api.loadbalancer.server.port=8080
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  # ── Worker (type: none — same image, different CMD) ────────────────────────
+  worker:
+    image: {{ service_image('api') }}
+    command: ["./app", "worker"]
+    environment:
+      <<: [*global-env, *env-vars, *runtime-env]
+    labels:
+{{ dozzle_labels('worker') }}
+    networks:
+      - example_network
+    secrets:
+      - source: app_db_user
+        target: db_username
+      - source: app_db_password
+        target: db_password
+    deploy:
+{{ deploy_resources('worker', stack='app-backend') }}
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  # ── Scheduler (type: none — same image, different CMD) ─────────────────────
+  scheduler:
+    image: {{ service_image('api') }}
+    command: ["./app", "scheduler"]
+    environment:
+      <<: [*global-env, *env-vars, *runtime-env]
+    labels:
+{{ dozzle_labels('scheduler') }}
+    networks:
+      - example_network
+    secrets:
+      - source: app_db_user
+        target: db_username
+      - source: app_db_password
+        target: db_password
+    deploy:
+{{ deploy_resources('scheduler', stack='app-backend') }}
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

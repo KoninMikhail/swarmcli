@@ -1,0 +1,25 @@
+# Traefik static configuration
+# This file is created as Docker config (simple strategy)
+
+# WARNING: insecure=true exposes dashboard without authentication.
+# For production, remove insecure and add auth middleware.
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: example_network
+
+log:
+  level: INFO
+
+accessLog: {}

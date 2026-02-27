@@ -1,0 +1,25 @@
+# Prometheus configuration
+# This file is created as Docker config (versioned strategy)
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: app-backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["app-backend-api:8080"]
+        labels:
+          stack: app-backend
+          service: api
+
+  - job_name: traefik
+    static_configs:
+      - targets: ["traefik:8080"]
+        labels:
+          stack: traefik

@@ -1,0 +1,17 @@
+engine: jinja2
+
+templates:
+  docker-stack:
+    source: templates/docker-stack.j2
+    output: .build/docker-stack.yml
+
+variable_sources:
+  - globals
+  - endpoints
+  - variables
+  - environment
+
+required_vars:
+  - GLOBAL_TZ
+  - SERVICE_MONITORING_PROMETHEUS_HOST
+  - SERVICE_MONITORING_GRAFANA_PUBLIC_HOST

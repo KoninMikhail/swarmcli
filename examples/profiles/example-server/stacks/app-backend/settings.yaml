@@ -1,0 +1,19 @@
+# Extended timeout — service runs DB migrations on startup
+services_ready_timeout: 90
+
+# One-shot init services (run once and exit) — exclude from readiness check
+# List service names from docker-stack.yml / services.yaml
+# readiness_exclude:
+#   - init
+#   - db_migrate
+
+# Java/Node.js projects may take long to build
+build_timeout: 900
+
+# More log lines for error diagnostics
+diagnostics_logs_tail: 50
+
+# Per-stack Git auth override (uncomment if this stack needs different credentials)
+# git:
+#   http_user: ${GIT_HTTP_USER}
+#   http_token: ${GIT_HTTP_TOKEN}

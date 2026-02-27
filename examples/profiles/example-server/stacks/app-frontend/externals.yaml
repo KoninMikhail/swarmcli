@@ -1,0 +1,2 @@
+# Frontend does not require secrets — API keys are embedded at build time via build args
+secrets: []

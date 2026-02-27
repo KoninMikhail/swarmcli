@@ -1,0 +1,55 @@
+# Instance configuration and state (contains secrets/tokens)
+# Managed by: swarmcli config
+.swarmcli.yaml
+.env
+.env.*
+
+# Log files
+*.log
+
+# Deployment locks
+.locks/
+
+# Cloned repositories (legacy global location)
+repos/
+
+# Per-stack repositories
+**/stacks/**/.repos/
+
+# Secrets files (global directory)
+.secrets/
+
+# Temporary commit message file
+commit_msg.txt
+
+# Template build outputs (generated from .j2 templates)
+.build/
+**/stacks/**/.build/
+
+# Deploy history (local to each stack)
+**/stacks/**/.deploy/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+.mypy_cache/
+
+
+# Agent transcripts
+agent-transcripts/
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
