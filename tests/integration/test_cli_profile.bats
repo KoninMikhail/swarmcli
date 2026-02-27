@@ -38,7 +38,7 @@ YAML
 
   # Ensure config exists
   if [ ! -f "$CONFIG_FILE" ]; then
-    bash "$SWARMCLI" config init 2>/dev/null
+    bash "$SWARMCLI" system config init 2>/dev/null
   fi
 }
 

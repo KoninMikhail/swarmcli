@@ -27,31 +27,31 @@ teardown() {
 }
 
 @test "swarmcli config path: shows file path" {
-  run bash "$SWARMCLI" config path
+  run bash "$SWARMCLI" system config path
   assert_success
   assert_output --partial ".swarmcli.yaml"
 }
 
 @test "swarmcli config init: creates config file" {
   rm -f "$CONFIG_FILE"
-  run bash "$SWARMCLI" config init
+  run bash "$SWARMCLI" system config init
   assert_success
   assert [ -f "$CONFIG_FILE" ]
 }
 
 @test "swarmcli config set and get: roundtrip" {
   rm -f "$CONFIG_FILE"
-  bash "$SWARMCLI" config init
-  bash "$SWARMCLI" config set operations.timeout 600
-  run bash "$SWARMCLI" config get operations.timeout
+  bash "$SWARMCLI" system config init
+  bash "$SWARMCLI" system config set operations.timeout 600
+  run bash "$SWARMCLI" system config get operations.timeout
   assert_success
   assert_output "600"
 }
 
 @test "swarmcli config list: shows all keys" {
   rm -f "$CONFIG_FILE"
-  bash "$SWARMCLI" config init
-  run bash "$SWARMCLI" config list
+  bash "$SWARMCLI" system config init
+  run bash "$SWARMCLI" system config list
   assert_success
   assert_output --partial "config_version"
 }
