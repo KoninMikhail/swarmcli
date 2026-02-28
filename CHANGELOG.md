@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2](https://github.com/KoninMikhail/swarmcli/compare/v0.2.1...v0.2.2) (2026-02-27)
+
+
+### Bug Fixes
+
+* fix secret rotation target preservation and pass --force to subcommands ([5192500](https://github.com/KoninMikhail/swarmcli/commit/51925005ccca3958169b1eda024ef2c5985ccf0a))
+* prevent set -u crashes in git sync for public repos ([ce32dde](https://github.com/KoninMikhail/swarmcli/commit/ce32dde6b443877a40e7426a08932043fa1b5a05))
+* resolve silent exits caused by set -e/pipefail and add check command alias ([47e6055](https://github.com/KoninMikhail/swarmcli/commit/47e6055b1637ec8f09d3fe7686c7d04bec7c5ba1))
+* update integration tests to use system config subcommand ([7d40e99](https://github.com/KoninMikhail/swarmcli/commit/7d40e99a719677ed4b67317d45db10a23cceb79c))
+
+
+### Documentation
+
+* improve documentation for git-based stacks ([989682c](https://github.com/KoninMikhail/swarmcli/commit/989682cc5e3d77f3bdb7e78c4ed97ea2efab7739))
+
+
+### Code Refactoring
+
+* move config commands under system config subcommand ([d2279d0](https://github.com/KoninMikhail/swarmcli/commit/d2279d01d215aba3c2544bac9a736be6ed96a4ed))
+
 ## [0.2.1](https://github.com/KoninMikhail/swarmcli/compare/v0.2.0...v0.2.1) (2026-02-27)
 
 

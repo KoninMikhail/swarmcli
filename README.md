@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/KoninMikhail/swarmcli/actions/workflows/ci.yml/badge.svg)](https://github.com/KoninMikhail/swarmcli/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.1)](CHANGELOG.md) <!-- x-release-please-version -->
+[![Version](https://img.shields.io/badge/version-0.2.2)](CHANGELOG.md) <!-- x-release-please-version -->
 
 > Deploy to multiple Docker Swarm servers from one repo — no config drift, no rollback scripts, no CI boilerplate.
 
@@ -316,7 +316,7 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating. To r
 
 ## Version
 
-**Current:** 0.2.1 <!-- x-release-please-version -->
+**Current:** 0.2.2 <!-- x-release-please-version -->
 
 - [Changelog](CHANGELOG.md)
 - [Full documentation](docs/README.md)
