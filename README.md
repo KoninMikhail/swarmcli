@@ -309,7 +309,7 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating. To r
 
 ## Version
 
-**Current:** 0.2.5 <!-- x-release-please-version -->
+**Current:** 0.2.6 <!-- x-release-please-version -->
 
 - [Changelog](CHANGELOG.md)
 - [Full documentation](docs/README.md)

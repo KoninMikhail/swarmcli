@@ -18,7 +18,7 @@
 set -euo pipefail
 
 # ===== Configuration =====
-VERSION="0.2.5" # x-release-please-version
+VERSION="0.2.6" # x-release-please-version
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/.swarmcli.yaml"
 REPOS_DIR="$SCRIPT_DIR/repos"

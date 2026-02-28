@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6](https://github.com/KoninMikhail/swarmcli/compare/v0.2.5...v0.2.6) (2026-02-28)
+
+
+### Bug Fixes
+
+* replace broken static version badge with dynamic GitHub Release … ([084030c](https://github.com/KoninMikhail/swarmcli/commit/084030cfd4214406026b96abf840b482e56dad65))
+* replace broken static version badge with dynamic GitHub Release badge ([0037a65](https://github.com/KoninMikhail/swarmcli/commit/0037a65a9b307d1c104000ce3fafb64f50e20714))
+
 ## [0.2.5](https://github.com/KoninMikhail/swarmcli/compare/v0.2.4...v0.2.5) (2026-02-28)
 
 
