@@ -124,6 +124,7 @@ SwarmCLI uses **Docker-familiar command names** — same style, same semantics:
 | `swarmcli logs <stack>` | `docker service logs` | Service logs |
 | `swarmcli build [stack]` | `docker build` | Build images |
 | `swarmcli deploy [stack]` | `docker stack deploy` | Deploy stack |
+| `swarmcli down [stack]` | `docker stack rm` | Remove deployed stack |
 | `swarmcli rollback [stack]` | — | Rollback to previous version |
 | `swarmcli secret ls` | `docker secret ls` | List secrets |
 | `swarmcli inspect <stack>` | `docker stack services` | Stack details |
@@ -144,6 +145,7 @@ swarmcli inspect <stack>         # Stack details
 swarmcli sync [stack]            # Sync repositories
 swarmcli build [stack]           # Build images
 swarmcli deploy [stack]          # Deploy
+swarmcli down [stack]            # Remove deployed stack (aliases: rm, remove)
 swarmcli rollback [stack]        # Rollback to previous version
 
 # Logs

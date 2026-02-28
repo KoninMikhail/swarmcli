@@ -40,6 +40,7 @@
 #   sync [stack]            Sync git repositories for services
 #   build [stack]           Build Docker images for services
 #   deploy [stack]          Deploy stack to Docker Swarm
+#   down [stack]            Remove deployed stack (aliases: rm, remove)
 #   rollback [stack]        Rollback to previous deployment
 #
 # Configuration:
