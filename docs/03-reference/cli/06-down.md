@@ -78,7 +78,7 @@ swarmcli down my-app --dry-run
 ### In CI/CD
 
 ```bash
-swarmcli down my-app --force --profile server-dev
+swarmcli down my-app --force
 ```
 
 ## Behavior

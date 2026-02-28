@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: swarmcli deploy my-app --profile server-dev
+      - run: swarmcli deploy my-app
 ```
 
 ### Profile Architecture

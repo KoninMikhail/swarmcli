@@ -317,11 +317,15 @@ swarmcli deploy my-app --json
 
 ### 1. Test on Dev Before Prod
 
+If you manage multiple servers, use `--profile` to override the default:
+
 ```bash
 swarmcli deploy my-app --profile server-dev
-# Testing
+# Testing...
 swarmcli deploy my-app --profile server-prod
 ```
+
+On a single server the default profile is already set via `swarmcli use`, so just run `swarmcli deploy my-app`.
 
 ### 2. Use Dry-run
 

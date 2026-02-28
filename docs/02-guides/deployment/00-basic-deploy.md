@@ -17,7 +17,9 @@ What happens:
 
 ## Deploy with Flags
 
-### Specific Profile
+### Override Profile
+
+By default, SwarmCLI uses the profile saved via `swarmcli use`. Use `--profile` only to override it for a single command:
 
 ```bash
 swarmcli deploy my-app --profile server-prod
@@ -113,6 +115,8 @@ Shows plan without execution. Useful for verification.
 
 ## Deploy from CI/CD
 
+> The default profile is already set on the server via `swarmcli use`. You do **not** need `--profile` unless you deploy to multiple servers from one runner.
+
 ### Basic Pipeline
 
 ```yaml
@@ -120,7 +124,7 @@ Shows plan without execution. Useful for verification.
 deploy:
   stage: deploy
   script:
-    - swarmcli deploy my-app --profile server-dev
+    - swarmcli deploy my-app
   only:
     - develop
 ```
@@ -131,8 +135,7 @@ deploy:
 deploy:
   stage: deploy
   script:
-    - swarmcli deploy my-app 
-        --profile server-$CI_ENVIRONMENT_NAME
+    - swarmcli deploy my-app
         --service api --branch $CI_COMMIT_BRANCH --commit $CI_COMMIT_SHA
   only:
     - main
@@ -151,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: swarmcli deploy my-app --profile server-dev
+      - run: swarmcli deploy my-app
 ```
 
 ## Deploy Monitoring

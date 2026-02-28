@@ -2,6 +2,8 @@
 
 SwarmCLI provides ready-made patterns for minimal GitLab CI boilerplate.
 
+> **Note:** The default profile is already configured on the server via `swarmcli use <profile>` during installation. You do **not** need `--profile` in CI/CD commands unless you deploy to multiple servers from a single runner.
+
 ## Quick Start
 
 ### Option 1: Direct CLI call (recommended)
@@ -15,10 +17,9 @@ stages:
 deploy:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile "$PROFILE"
+    - swarmcli deploy "$STACK_NAME"
   variables:
     STACK_NAME: "my-app"
-    PROFILE: "server-dev"
   when: manual
 ```
 
@@ -138,10 +139,9 @@ Variables with the `DEPLOY_*` prefix are automatically added to the `environment
 deploy:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile "$PROFILE"
+    - swarmcli deploy "$STACK_NAME"
   variables:
     STACK_NAME: "my-app"
-    PROFILE: "server-dev"
   when: manual
 ```
 
@@ -151,7 +151,7 @@ deploy:
 deploy:dev:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile server-dev --branch "$CI_COMMIT_REF_NAME"
+    - swarmcli deploy "$STACK_NAME" --branch "$CI_COMMIT_REF_NAME"
   variables:
     STACK_NAME: "my-app"
   rules:
@@ -160,7 +160,7 @@ deploy:dev:
 deploy:prod:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile server-prod
+    - swarmcli deploy "$STACK_NAME"
   variables:
     STACK_NAME: "my-app"
     DEPLOY_FLAGS: "--prune"
@@ -175,7 +175,7 @@ deploy:prod:
 deploy:staging:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile server-staging
+    - swarmcli deploy "$STACK_NAME"
   variables:
     STACK_NAME: "my-app"
   rules:
@@ -184,12 +184,31 @@ deploy:staging:
 deploy:prod:
   stage: deploy
   script:
-    - swarmcli deploy "$STACK_NAME" --profile server-prod
+    - swarmcli deploy "$STACK_NAME"
   variables:
     STACK_NAME: "my-app"
   when: manual
   rules:
     - if: $CI_COMMIT_TAG
+```
+
+### Multi-server Pipelines
+
+If the CI runner deploys to **multiple servers**, use `--profile` to specify the target:
+
+```yaml
+deploy:dev:
+  script:
+    - swarmcli deploy "$STACK_NAME" --profile server-dev --branch "$CI_COMMIT_REF_NAME"
+
+deploy:staging:
+  script:
+    - swarmcli deploy "$STACK_NAME" --profile server-staging
+
+deploy:prod:
+  script:
+    - swarmcli deploy "$STACK_NAME" --profile server-prod
+  when: manual
 ```
 
 ### With additional tests
