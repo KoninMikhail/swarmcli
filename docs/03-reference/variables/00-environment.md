@@ -194,12 +194,13 @@ services:
 # .gitlab-ci.yml
 variables:
   STACK: my-app
-  PROFILE: server-${CI_ENVIRONMENT_NAME}
 
 deploy:
   script:
-    - swarmcli deploy $STACK --profile $PROFILE --commit $CI_COMMIT_SHA
+    - swarmcli deploy $STACK --commit $CI_COMMIT_SHA
 ```
+
+> `--profile` is not required here — the default profile is already set on the server via `swarmcli use`. Add it only for multi-server setups.
 
 ## Profile Variables
 

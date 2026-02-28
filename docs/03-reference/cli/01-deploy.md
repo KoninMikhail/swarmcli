@@ -85,7 +85,9 @@ swarmcli deploy my-app \
 swarmcli deploy my-app
 ```
 
-### Deploy from specific profile
+### Override default profile
+
+By default the saved profile (from `swarmcli use`) is used. Override for a single command:
 
 ```bash
 swarmcli deploy my-app --profile server-prod

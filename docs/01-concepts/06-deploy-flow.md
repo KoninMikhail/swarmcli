@@ -306,7 +306,7 @@ swarmcli deploy my-app --dry-run
 
 | Flag | Description |
 |------|-------------|
-| `--profile <name>` | Server profile |
+| `--profile <name>` | Override default profile (optional) |
 | `--branch <name>` | Branch for all services |
 | `--service <name>` | Deploy specific service |
 | `--with-secrets` | Sync secrets |
@@ -412,10 +412,11 @@ swarmcli logs my-app --service api -f
 ### 3. Start with Dev
 
 ```bash
-# First dev
-swarmcli deploy my-app --profile server-dev
+# On a single server the default profile is already set:
+swarmcli deploy my-app
 
-# Then prod
+# If managing multiple servers, override the profile:
+swarmcli deploy my-app --profile server-dev
 swarmcli deploy my-app --profile server-prod
 ```
 

@@ -26,7 +26,7 @@ swarmcli [global-flags] <command> [subcommand] [args] [flags]
 
 | Flag | Description |
 |------|-------------|
-| `--profile <name>` | Server profile |
+| `--profile <name>` | Override default profile (optional — uses saved default from `.swarmcli.yaml` if omitted) |
 | `--json` | JSON output for automation |
 | `--quiet` | Suppress info messages |
 | `--no-color` | Disable colored output |

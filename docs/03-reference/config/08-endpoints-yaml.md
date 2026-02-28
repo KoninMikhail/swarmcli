@@ -99,7 +99,7 @@ runtime:
 ### List services in registry
 
 ```bash
-swarmcli registry list --profile server-dev
+swarmcli registry list
 ```
 
 Example output:
@@ -123,7 +123,7 @@ Services Registry (profile: server-dev)
 ### Validate references
 
 ```bash
-swarmcli registry validate --profile server-dev
+swarmcli registry validate
 ```
 
 Validates all profile stacks for undefined `${SERVICE_*}` references.

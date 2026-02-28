@@ -96,7 +96,7 @@ secrets:
 swarmcli secret sync
 
 # During deploy (secrets are synced automatically)
-swarmcli deploy my-app --profile server-prod
+swarmcli deploy my-app
 ```
 
 ## Usage in docker-stack.yml
@@ -187,7 +187,7 @@ swarmcli secret ls --json
 
 ```bash
 # Check presence of all required secrets
-swarmcli secret check <stack> --profile <profile>
+swarmcli secret check <stack>
 
 # If secret is not in Swarm but file exists in .secrets/,
 # it will be created automatically
@@ -330,7 +330,7 @@ swarmcli secret sync
 echo -n "new_password_456" > /opt/secrets/db_password
 
 # 2. Sync and deploy
-swarmcli deploy my-app --profile server-prod --with-secrets
+swarmcli deploy my-app --with-secrets
 ```
 
 #### During deploy
@@ -382,7 +382,7 @@ environment:
 
 ```bash
 # Always check secrets before deploy
-swarmcli secret check my-app --profile server-prod
+swarmcli secret check my-app
 ```
 
 ### 6. Use generation for passwords
@@ -471,7 +471,7 @@ Before production:
 - [ ] `SECRETS_ROOT` is outside swarmcli repository
 - [ ] `variables.yaml` files do NOT contain secrets
 - [ ] `externals.yaml` is up to date for each stack
-- [ ] Secrets published: `swarmcli secret check --profile prod`
+- [ ] Secrets published: `swarmcli secret check`
 - [ ] Applications read secrets from files (`/run/secrets/`)
 - [ ] Secrets are not logged in applications
 - [ ] Generated passwords of sufficient length are used

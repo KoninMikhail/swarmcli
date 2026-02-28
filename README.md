@@ -159,7 +159,7 @@ swarmcli secret create <name>
 ### Deploy Flags
 
 ```bash
---profile <name>     # Server profile
+--profile <name>     # Override default profile (optional)
 --branch <name>      # Branch for all services
 --service <name>     # Target service
 --with-secrets       # Sync secrets before deploy
@@ -173,7 +173,7 @@ swarmcli secret create <name>
 
 ## CI/CD Integration
 
-One CLI call replaces pages of pipeline config. Works with GitLab CI, GitHub Actions, and any shell-based runner.
+One CLI call replaces pages of pipeline config. Works with GitLab CI, GitHub Actions, and any shell-based runner. The default profile is already set on the server via `swarmcli use` — no need to pass `--profile` in every command.
 
 ```yaml
 # GitHub Actions example
@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: swarmcli deploy my-app --profile server-dev
+      - run: swarmcli deploy my-app
 ```
 
 Also works from cron jobs, shell scripts, or manual SSH — it's just a CLI.

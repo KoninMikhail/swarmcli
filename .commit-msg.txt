@@ -1,0 +1,6 @@
+docs: clarify --profile flag as optional override across all documentation
+
+The default profile is already set on the server via `swarmcli use` during
+installation. Removed mandatory-looking --profile from CI/CD examples and
+basic commands, updated flag descriptions to "optional override", added
+separate "Multi-server Pipelines" sections where --profile is genuinely needed.
