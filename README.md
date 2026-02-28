@@ -274,37 +274,28 @@ A: SwarmCLI is actively used in production by several companies. Bugs surface oc
 
 ## Documentation
 
-### Getting Started
+> **[Wiki](https://github.com/KoninMikhail/swarmcli/wiki)** — primary user documentation with guides, concepts, and reference.
 
-- [Overview](docs/00-onboarding/00-overview.md) — what SwarmCLI is
-- [Requirements](docs/00-onboarding/01-requirements.md) — system requirements
-- [Installation](docs/00-onboarding/02-installation.md) — install and configure
-- [First deploy](docs/00-onboarding/03-first-deploy.md) — up and running in 5 minutes
+### Wiki (User Documentation)
 
-### Concepts
+| Section | Pages |
+|---------|-------|
+| **Getting Started** | [Requirements](https://github.com/KoninMikhail/swarmcli/wiki/Requirements) · [Installation](https://github.com/KoninMikhail/swarmcli/wiki/Installation) · [Quick Start](https://github.com/KoninMikhail/swarmcli/wiki/Quick-Start) |
+| **Concepts** | [Profiles](https://github.com/KoninMikhail/swarmcli/wiki/Profiles) · [Stacks](https://github.com/KoninMikhail/swarmcli/wiki/Stacks) · [Services](https://github.com/KoninMikhail/swarmcli/wiki/Services) · [Deploy Flow](https://github.com/KoninMikhail/swarmcli/wiki/Deploy-Flow) |
+| **Guides** | [Create Profile](https://github.com/KoninMikhail/swarmcli/wiki/Create-Profile) · [Create Stack](https://github.com/KoninMikhail/swarmcli/wiki/Create-Stack) · [Deployment](https://github.com/KoninMikhail/swarmcli/wiki/Deployment-Guide) · [Rollback](https://github.com/KoninMikhail/swarmcli/wiki/Rollback) · [Secrets](https://github.com/KoninMikhail/swarmcli/wiki/Secrets-Management) · [Templates](https://github.com/KoninMikhail/swarmcli/wiki/Jinja2-Templating) · [Resources](https://github.com/KoninMikhail/swarmcli/wiki/Resource-Management) · [CI/CD](https://github.com/KoninMikhail/swarmcli/wiki/CI-CD-Integration) |
+| **Reference** | [CLI Reference](https://github.com/KoninMikhail/swarmcli/wiki/CLI-Reference) · [Configuration Files](https://github.com/KoninMikhail/swarmcli/wiki/Configuration-Files) · [Environment Variables](https://github.com/KoninMikhail/swarmcli/wiki/Environment-Variables) |
+| **Operations** | [Troubleshooting](https://github.com/KoninMikhail/swarmcli/wiki/Troubleshooting) |
 
-- [Profiles](docs/01-concepts/03-profiles.md) — server profiles
-- [Stacks](docs/01-concepts/04-stacks.md) — application stacks
-- [Services](docs/01-concepts/05-services.md) — service types
-- [Deploy flow](docs/01-concepts/06-deploy-flow.md) — what happens on deploy
+### Developer Documentation (docs/)
 
-### Guides
+For architecture details, ADRs, and in-depth internals — see [docs/](docs/README.md).
 
-- [Create profile](docs/02-guides/profiles/00-create-profile.md)
-- [Create stack](docs/02-guides/stacks/00-create-stack.md)
-- [Jinja2 templating](docs/02-guides/templates/00-overview.md)
-- [Secrets management](docs/02-guides/secrets/00-overview.md)
-- [Resource management](docs/02-guides/resources/00-overview.md)
-
-### Reference
-
-- [CLI commands](docs/03-reference/cli/00-overview.md) — full reference
-- [Configuration](docs/03-reference/config/00-overview.md) — all YAML files
-- [Environment variables](docs/03-reference/variables/00-environment.md)
-
-### Operations
-
-- [CI/CD integration](docs/05-operations/gitlab-ci/00-overview.md) — CI/CD integration patterns
+| Section | Content |
+|---------|---------|
+| [Architecture](docs/04-architecture/) | System overview, module structure, data flow |
+| [ADRs](docs/adr/) | Architecture Decision Records |
+| [Modules](docs/03-reference/modules/00-overview.md) | Internal module reference |
+| [Server Setup](docs/05-operations/server/) | Server installation and configuration |
 
 ---
 

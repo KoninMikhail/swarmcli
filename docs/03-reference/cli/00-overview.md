@@ -45,7 +45,7 @@ swarmcli system version
 
 ### system health
 
-Check dependencies:
+Check all dependencies (Bash, Docker, Git, jq, Python, Jinja2, PyYAML):
 
 ```bash
 swarmcli system health
@@ -58,6 +58,35 @@ Update SwarmCLI from git:
 ```bash
 swarmcli system update [branch]
 ```
+
+### system config — manage `.swarmcli.yaml`
+
+Instance-level configuration: git tokens, secrets path, locks directory, default profile. Without this file the CLI will not start.
+
+```bash
+swarmcli system config list              # Show current configuration
+swarmcli system config get <key>         # Get value by dot-path
+swarmcli system config set <key> <value> # Set value by dot-path
+swarmcli system config edit              # Open in $EDITOR
+swarmcli system config path              # Show config file path
+swarmcli system config init              # Create config with defaults
+swarmcli system config reset             # Reset to defaults (backup created)
+```
+
+Common keys:
+
+| Key | Description |
+|-----|-------------|
+| `state.default_profile` | Default profile name |
+| `paths.secrets` | Secrets directory path |
+| `paths.locks` | Locks directory path |
+| `git.auth.http_token` | Git HTTPS token |
+| `git.auth.http_user` | Git username (optional) |
+| `operations.timeout` | General operation timeout (sec) |
+| `operations.lock_timeout` | Lock timeout (sec) |
+| `operations.log_format` | Log format (`text` or `json`) |
+
+> `install.sh` creates this file interactively. To create manually: `swarmcli system config init`.
 
 ## Global
 

@@ -2,6 +2,39 @@
 
 Deploy a test application in 5 minutes.
 
+## Prerequisites
+
+Before your first deploy, SwarmCLI must be installed and configured:
+
+```bash
+git clone https://github.com/KoninMikhail/swarmcli.git /opt/swarmcli
+cd /opt/swarmcli
+./install.sh
+```
+
+The installer creates `.swarmcli.yaml` (git token, secrets path, locks directory), sets up the `swarmcli` command (symlink or alias), and optionally selects a default profile. Without `.swarmcli.yaml` the CLI will not start.
+
+<details>
+<summary>Manual setup (alternative)</summary>
+
+If you prefer not to use the installer, create `.swarmcli.yaml` manually — see [Installation](02-installation.md) for details.
+
+</details>
+
+After installation, ensure you have a profile:
+
+```bash
+# Create a profile if none exist
+swarmcli create
+# Select: Profile (server configuration)
+
+# Set as default
+swarmcli use <profile-name>
+
+# Verify everything is ready
+swarmcli system health
+```
+
 ## What We'll Do
 
 1. Create a simple stack with Nginx
@@ -295,7 +328,7 @@ Configuration will apply without rebuilding the image (this is an external image
 
 ```bash
 # Remove stack from Swarm
-docker stack rm hello-world
+swarmcli down hello-world
 
 # Remove configuration (optional)
 rm -rf profiles/server-dev/stacks/hello-world

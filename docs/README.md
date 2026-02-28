@@ -1,51 +1,46 @@
-# SwarmCLI — Documentation
+# SwarmCLI — Developer Documentation
 
-CI/CD platform for Docker Swarm with support for server profiles.
+In-depth reference, architecture, and internals for SwarmCLI contributors and advanced users.
 
-**Version:** 0.1.0  
-**Status:** CLI fully functional
+> **Looking for user documentation?** See the **[Wiki](https://github.com/KoninMikhail/swarmcli/wiki)** for guides, concepts, and practical how-tos.
 
 ---
 
-## 📁 Documentation Structure
+## Documentation Structure
 
 ```
 docs/
-├── 00-onboarding/        → 🎓 Quick start for beginners
-├── 01-concepts/          → 💡 Core concepts
-├── 02-guides/            → 📖 Practical guides
-├── 03-reference/         → 📚 Full reference
-├── 04-architecture/      → 🏗️ System architecture
-├── 05-operations/        → ⚙️ DevOps and CI/CD
-└── adr/                  → 📋 Architecture Decision Records
+├── 00-onboarding/        Getting started (requirements, installation, first deploy)
+├── 01-concepts/          Core concepts (profiles, stacks, services, deploy flow)
+├── 02-guides/            Practical guides (profiles, stacks, secrets, templates)
+├── 03-reference/         Full reference (CLI, config files, modules, variables)
+├── 04-architecture/      System architecture and data flow
+├── 05-operations/        DevOps, CI/CD, server setup, troubleshooting
+└── adr/                  Architecture Decision Records
 ```
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/KoninMikhail/swarmcli.git /opt/swarmcli
 cd /opt/swarmcli
 
-# 2. Configure server profile
-cp -r profiles/server-dev profiles/my-server
-nano profiles/my-server/config.yaml
+# 2. Run the installer
+./install.sh
 
-# 3. Set default profile
-./bin/swarm.sh use my-server
+# 3. Deploy a stack
+swarmcli deploy my-stack
 
-# 4. Check dependencies
-./bin/swarm.sh system health
-
-# 5. Deploy a stack
-./bin/swarm.sh deploy my-stack
+# 4. Check status
+swarmcli ps my-stack
 ```
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 
 ### Getting Started
 
@@ -97,7 +92,7 @@ nano profiles/my-server/config.yaml
 
 ---
 
-## 🔍 Quick Search
+## Quick Search
 
 | Looking for... | Where to find |
 |----------------|---------------|
@@ -114,7 +109,7 @@ nano profiles/my-server/config.yaml
 
 ---
 
-## 📝 Contributing to Documentation
+## Contributing to Documentation
 
 When adding new pages:
 
