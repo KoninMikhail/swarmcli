@@ -46,11 +46,6 @@ TARGETS = [
     },
     {
         "file": "README.md",
-        "pattern": r"(version-)[0-9]+\.[0-9]+\.[0-9]+(-green)",
-        "replace": r"\g<1>{version}\2",
-    },
-    {
-        "file": "README.md",
         "pattern": r"(\*\*Current:\*\* )[0-9]+\.[0-9]+\.[0-9]+",
         "replace": r"\g<1>{version}",
     },
