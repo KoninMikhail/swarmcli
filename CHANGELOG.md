@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4](https://github.com/KoninMikhail/swarmcli/compare/v0.2.3...v0.2.4) (2026-02-28)
+
+
+### Documentation
+
+* restructure documentation with wiki integration and fix inconsi… ([4bec564](https://github.com/KoninMikhail/swarmcli/commit/4bec564036392882280bfd5ec99e4e33cc518eb7))
+* restructure documentation with wiki integration and fix inconsistencies ([30ed0f5](https://github.com/KoninMikhail/swarmcli/commit/30ed0f58420c7ea012374de7f088c38375ee70e1))
+
 ## [0.2.3](https://github.com/KoninMikhail/swarmcli/compare/v0.2.2...v0.2.3) (2026-02-28)
 
 
