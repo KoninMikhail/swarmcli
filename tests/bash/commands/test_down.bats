@@ -18,7 +18,7 @@ setup() {
   export -f stack_exists
 
   ensure_stack_exists() {
-    stack_exists "$1" || { echo "stack not found: $1" >&2; return 1; }
+    stack_exists "$1" || fail "stack not found: $1"
   }
   export -f ensure_stack_exists
 
@@ -150,6 +150,7 @@ setup() {
   }
   export -f docker
 
-  echo "n" | run cmd_down "test-stack"
+  run cmd_down "test-stack"
   assert_success
+  assert_output --partial "--force"
 }

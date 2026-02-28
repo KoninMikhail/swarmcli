@@ -392,21 +392,26 @@ cmd_down() {
   services_count=$(docker stack services "$stack" --format '{{.Name}}' 2>/dev/null | wc -l)
   
   # Confirmation (unless --force)
-  if [ "$force" != "1" ] && [ -t 0 ]; then
-    echo ""
-    echo "This will remove stack: $(c 33 "$stack")"
-    echo "  • Services: $services_count"
-    echo "  • Profile: $ACTIVE_PROFILE"
-    echo ""
-    printf "Continue? [y/N]: "
-    read -r answer
-    case "$answer" in
-      [Yy]*) ;;
-      *) 
-        log info "cancelled"
-        return 0
-        ;;
-    esac
+  if [ "$force" != "1" ]; then
+    if [ -t 0 ]; then
+      echo ""
+      echo "This will remove stack: $(c 33 "$stack")"
+      echo "  • Services: $services_count"
+      echo "  • Profile: $ACTIVE_PROFILE"
+      echo ""
+      printf "Continue? [y/N]: "
+      read -r answer
+      case "$answer" in
+        [Yy]*) ;;
+        *)
+          log info "cancelled"
+          return 0
+          ;;
+      esac
+    else
+      log warn "non-interactive mode: use --force to remove stack"
+      return 0
+    fi
   fi
   
   if [ "$DRY_RUN" = "1" ]; then
