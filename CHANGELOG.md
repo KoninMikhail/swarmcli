@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3](https://github.com/KoninMikhail/swarmcli/compare/v0.2.2...v0.2.3) (2026-02-28)
+
+
+### Documentation
+
+* add down/rm/remove command to documentation and tests ([6f8985e](https://github.com/KoninMikhail/swarmcli/commit/6f8985e8e8ba71c36f2fb8ab547ffbd073e3458d))
+* add down/rm/remove command to documentation and tests ([c45c58d](https://github.com/KoninMikhail/swarmcli/commit/c45c58d6b2cdf6a03f427e3782779d0b86d0217b))
+
 ## [0.2.2](https://github.com/KoninMikhail/swarmcli/compare/v0.2.1...v0.2.2) (2026-02-27)
 
 
