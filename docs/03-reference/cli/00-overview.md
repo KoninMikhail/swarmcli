@@ -202,6 +202,19 @@ Flags:
 - `--force` — force rebuild
 - `--prune` — remove old images
 
+### [down](06-down.md)
+
+Remove deployed stack from Docker Swarm:
+
+```bash
+swarmcli down [stack] [--force]
+```
+
+Aliases: `rm`, `remove`
+
+Flags:
+- `--force`, `-f` — skip confirmation prompt
+
 ### rollback
 
 Rollback to previous version:
@@ -355,6 +368,8 @@ swarmcli plugin <name> [args]
 | `l` | `logs` |
 | `list` | `ls` |
 | `status` | `ps` |
+| `rm` | `down` |
+| `remove` | `down` |
 | `validate` | `check` |
 | `profiles` | `profile` |
 | `secrets` | `secret` |
@@ -373,6 +388,10 @@ swarmcli deploy my-app --branch feature/new
 
 # Deploy only API from different branch
 swarmcli deploy my-app --service api --branch hotfix/fix
+
+# Remove deployed stack
+swarmcli down my-app
+swarmcli rm my-app --force
 
 # Rollback
 swarmcli rollback my-app

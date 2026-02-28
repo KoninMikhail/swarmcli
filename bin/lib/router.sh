@@ -17,6 +17,7 @@ resolve_command_alias() {
     # Backwards compatibility
     list) echo "ls" ;;
     status) echo "ps" ;;
+    rm|remove) echo "down" ;;
     profiles) echo "profile" ;;
     secrets) echo "secret" ;;
     locks) echo "lock" ;;

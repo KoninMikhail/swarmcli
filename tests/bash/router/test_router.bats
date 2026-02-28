@@ -57,3 +57,13 @@ setup() {
   run resolve_command_alias locks
   assert_output "lock"
 }
+
+@test "resolve_command_alias: rm -> down" {
+  run resolve_command_alias rm
+  assert_output "down"
+}
+
+@test "resolve_command_alias: remove -> down" {
+  run resolve_command_alias remove
+  assert_output "down"
+}
