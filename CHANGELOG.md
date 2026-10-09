@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * **deps:** bump actions/checkout from 6.0.2 to 7.0.0 ([5652ed7](https://github.com/KoninMikhail/swarmcli/commit/5652ed7f2acb399c4c20b72d1b5551a1029749de))
 * **deps:** bump actions/checkout from 6.0.2 to 7.0.0 ([06c7716](https://github.com/KoninMikhail/swarmcli/commit/06c77164463d362560561ed2a0a34158ec6ad5dd))
+* **deps:** bump actions/setup-python from 6.2.0 to 6.3.0 ([9d7e24c](https://github.com/KoninMikhail/swarmcli/commit/9d7e24c8d675bde331e1761d54b588fef3df185a))
+* **deps:** bump actions/setup-python from 6.2.0 to 6.3.0 ([7c72ec4](https://github.com/KoninMikhail/swarmcli/commit/7c72ec466a77c09e9370a5710f971932541d9a42))
 * **deps:** bump googleapis/release-please-action from 4.4.0 to 5.0.0 ([5f2e03e](https://github.com/KoninMikhail/swarmcli/commit/5f2e03e49049dd62f7aa50cf2a9c0fbe089d80dd))
 * **deps:** bump googleapis/release-please-action from 4.4.0 to 5.0.0 ([f2f1bcb](https://github.com/KoninMikhail/swarmcli/commit/f2f1bcbc545df749169894d1bc6801cb77efeb69))
 * **deps:** update jinja2 requirement from &lt;4.0,&gt;=2.10 to &gt;=3.1.6,&lt;4.0 ([4d27a43](https://github.com/KoninMikhail/swarmcli/commit/4d27a4390372965fef213be629ed256e5ea1fce9))
