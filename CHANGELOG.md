@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7](https://github.com/KoninMikhail/swarmcli/compare/v0.2.6...v0.2.7) (2026-10-09)
+
+
+### Build
+
+* **deps:** bump actions/checkout from 6.0.2 to 7.0.0 ([5652ed7](https://github.com/KoninMikhail/swarmcli/commit/5652ed7f2acb399c4c20b72d1b5551a1029749de))
+* **deps:** bump actions/checkout from 6.0.2 to 7.0.0 ([06c7716](https://github.com/KoninMikhail/swarmcli/commit/06c77164463d362560561ed2a0a34158ec6ad5dd))
+* **deps:** bump googleapis/release-please-action from 4.4.0 to 5.0.0 ([5f2e03e](https://github.com/KoninMikhail/swarmcli/commit/5f2e03e49049dd62f7aa50cf2a9c0fbe089d80dd))
+* **deps:** bump googleapis/release-please-action from 4.4.0 to 5.0.0 ([f2f1bcb](https://github.com/KoninMikhail/swarmcli/commit/f2f1bcbc545df749169894d1bc6801cb77efeb69))
+* **deps:** update jinja2 requirement from &lt;4.0,&gt;=2.10 to &gt;=3.1.6,&lt;4.0 ([4d27a43](https://github.com/KoninMikhail/swarmcli/commit/4d27a4390372965fef213be629ed256e5ea1fce9))
+* **deps:** update jinja2 requirement from &lt;4.0,&gt;=2.10 to &gt;=3.1.6,&lt;4.0 ([9535e8b](https://github.com/KoninMikhail/swarmcli/commit/9535e8b78267d4b2ce32966b31bf9d91c3493d27))
+* **deps:** update pyyaml requirement from &lt;7.0,&gt;=5.1 to &gt;=6.0.3,&lt;7.0 ([ea4c9bd](https://github.com/KoninMikhail/swarmcli/commit/ea4c9bd59ca8b16800ed96f2b801d60954b9c975))
+* **deps:** update pyyaml requirement from &lt;7.0,&gt;=5.1 to &gt;=6.0.3,&lt;7.0 ([137a79d](https://github.com/KoninMikhail/swarmcli/commit/137a79df7e8272e86fd5095a9e2fa869d0d2b3e3))
+
 ## [0.2.6](https://github.com/KoninMikhail/swarmcli/compare/v0.2.5...v0.2.6) (2026-02-28)
 
 
